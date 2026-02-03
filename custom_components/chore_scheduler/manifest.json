@@ -1,0 +1,12 @@
+{
+  "domain": "chore_scheduler",
+  "name": "Chore Scheduler",
+  "codeowners": ["@akarlsten"],
+  "config_flow": true,
+  "dependencies": ["todo"],
+  "documentation": "https://github.com/akarlsten/hass-chore-scheduler",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/akarlsten/hass-chore-scheduler/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

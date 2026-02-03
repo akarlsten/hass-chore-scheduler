@@ -1,0 +1,135 @@
+add_chore:
+  name: Add Chore
+  description: Create a new chore with a schedule.
+  fields:
+    name:
+      name: Name
+      description: The name of the chore.
+      required: true
+      example: "Vacuum the floors"
+      selector:
+        text:
+    description:
+      name: Description
+      description: Optional description of the chore.
+      required: false
+      example: "Vacuum all rooms including under furniture"
+      selector:
+        text:
+          multiline: true
+    schedule:
+      name: Schedule
+      description: Schedule configuration (type, days, time, interval).
+      required: false
+      example: '{"type": "weekly", "days": ["sunday"], "time": "10:00", "interval": 1}'
+      selector:
+        object:
+    assignment:
+      name: Assignment
+      description: Assignment configuration (mode, assignees).
+      required: false
+      example: '{"mode": "rotating", "assignees": ["person.adam", "person.partner"]}'
+      selector:
+        object:
+    target_todo_list:
+      name: Target Todo List
+      description: The todo list entity to add items to.
+      required: false
+      selector:
+        entity:
+          domain: todo
+    notifications:
+      name: Notifications
+      description: Notification configuration.
+      required: false
+      example: '{"enabled": true, "remind_before": 60, "notify_targets": ["notify.mobile_app_phone"]}'
+      selector:
+        object:
+    enabled:
+      name: Enabled
+      description: Whether the chore is enabled.
+      required: false
+      default: true
+      selector:
+        boolean:
+
+update_chore:
+  name: Update Chore
+  description: Update an existing chore.
+  fields:
+    chore_id:
+      name: Chore ID
+      description: The ID of the chore to update.
+      required: true
+      selector:
+        text:
+    name:
+      name: Name
+      description: The new name of the chore.
+      required: false
+      selector:
+        text:
+    description:
+      name: Description
+      description: The new description.
+      required: false
+      selector:
+        text:
+          multiline: true
+    schedule:
+      name: Schedule
+      description: New schedule configuration.
+      required: false
+      selector:
+        object:
+    assignment:
+      name: Assignment
+      description: New assignment configuration.
+      required: false
+      selector:
+        object:
+    target_todo_list:
+      name: Target Todo List
+      description: New target todo list.
+      required: false
+      selector:
+        entity:
+          domain: todo
+    notifications:
+      name: Notifications
+      description: New notification configuration.
+      required: false
+      selector:
+        object:
+    enabled:
+      name: Enabled
+      description: Whether the chore is enabled.
+      required: false
+      selector:
+        boolean:
+
+delete_chore:
+  name: Delete Chore
+  description: Delete a chore.
+  fields:
+    chore_id:
+      name: Chore ID
+      description: The ID of the chore to delete.
+      required: true
+      selector:
+        text:
+
+trigger_chore:
+  name: Trigger Chore
+  description: Manually trigger a chore (create todo item now).
+  fields:
+    chore_id:
+      name: Chore ID
+      description: The ID of the chore to trigger.
+      required: true
+      selector:
+        text:
+
+list_chores:
+  name: List Chores
+  description: Get a list of all configured chores.

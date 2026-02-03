@@ -1,0 +1,100 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up chore scheduler",
+        "description": "Select the default todo list for chores. You can override this per-chore later.",
+        "data": {
+          "default_todo_list": "Default todo list"
+        }
+      }
+    },
+    "error": {
+      "invalid_todo_list": "The selected todo list is not available."
+    },
+    "abort": {
+      "already_configured": "Chore scheduler is already configured.",
+      "no_todo_lists": "No todo lists found. Please set up a todo integration first (e.g., Local to-do)."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "chore_count": {
+        "name": "Active chores"
+      },
+      "next_chore": {
+        "name": "Next chore"
+      }
+    }
+  },
+  "services": {
+    "add_chore": {
+      "name": "Add chore",
+      "description": "Create a new chore with a schedule.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "The name of the chore."
+        },
+        "description": {
+          "name": "Description",
+          "description": "Optional description of the chore."
+        },
+        "schedule": {
+          "name": "Schedule",
+          "description": "Schedule configuration (type, days, time, interval)."
+        },
+        "assignment": {
+          "name": "Assignment",
+          "description": "Assignment configuration (mode, assignees)."
+        },
+        "target_todo_list": {
+          "name": "Target todo list",
+          "description": "The todo list entity to add items to."
+        },
+        "notifications": {
+          "name": "Notifications",
+          "description": "Notification configuration."
+        },
+        "enabled": {
+          "name": "Enabled",
+          "description": "Whether the chore is enabled."
+        }
+      }
+    },
+    "update_chore": {
+      "name": "Update chore",
+      "description": "Update an existing chore.",
+      "fields": {
+        "chore_id": {
+          "name": "Chore ID",
+          "description": "The ID of the chore to update."
+        }
+      }
+    },
+    "delete_chore": {
+      "name": "Delete chore",
+      "description": "Delete a chore.",
+      "fields": {
+        "chore_id": {
+          "name": "Chore ID",
+          "description": "The ID of the chore to delete."
+        }
+      }
+    },
+    "trigger_chore": {
+      "name": "Trigger chore",
+      "description": "Manually trigger a chore (create todo item now).",
+      "fields": {
+        "chore_id": {
+          "name": "Chore ID",
+          "description": "The ID of the chore to trigger."
+        }
+      }
+    },
+    "list_chores": {
+      "name": "List chores",
+      "description": "Get a list of all configured chores."
+    }
+  }
+}

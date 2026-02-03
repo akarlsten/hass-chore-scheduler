@@ -1,0 +1,52 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Chore Scheduler",
+        "description": "Select the default todo list for chores. You can override this per-chore later. Found {todo_count} todo list(s).",
+        "data": {
+          "default_todo_list": "Default Todo List"
+        }
+      }
+    },
+    "error": {
+      "invalid_todo_list": "The selected todo list is not available."
+    },
+    "abort": {
+      "already_configured": "Chore Scheduler is already configured.",
+      "no_todo_lists": "No todo lists found. Please set up a todo integration first (e.g., Local To-do)."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "chore_count": {
+        "name": "Active Chores"
+      },
+      "next_chore": {
+        "name": "Next Chore"
+      }
+    }
+  },
+  "services": {
+    "add_chore": {
+      "name": "Add Chore",
+      "description": "Create a new chore with a schedule."
+    },
+    "update_chore": {
+      "name": "Update Chore",
+      "description": "Update an existing chore."
+    },
+    "delete_chore": {
+      "name": "Delete Chore",
+      "description": "Delete a chore."
+    },
+    "trigger_chore": {
+      "name": "Trigger Chore",
+      "description": "Manually trigger a chore (create todo item now)."
+    },
+    "list_chores": {
+      "name": "List Chores",
+      "description": "Get a list of all configured chores."
+    }
+  }
+}
