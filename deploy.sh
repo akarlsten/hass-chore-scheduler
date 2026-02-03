@@ -6,7 +6,7 @@ set -e
 
 HA_HOST="root@192.168.1.229"
 HA_PORT="5555"
-HA_CONFIG="/config"  # Standard HA config path
+HA_CONFIG="/root/homeassistant"  # Your HA config path
 
 echo "=== Chore Scheduler Deployment ==="
 echo ""

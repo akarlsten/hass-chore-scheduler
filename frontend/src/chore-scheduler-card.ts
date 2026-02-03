@@ -67,16 +67,20 @@ export class ChoreSchedulerCard extends LitElement {
     this._loading = true;
     try {
       // Try WebSocket API first
+      console.log("[ChoreScheduler] Loading chores via WebSocket...");
       const response = await this.hass.connection.sendMessagePromise<{
         chores: Chore[];
       }>({
         type: "chore_scheduler/list",
       });
+      console.log("[ChoreScheduler] WebSocket response:", response);
       this._chores = response?.chores ?? [];
-    } catch {
+    } catch (wsError) {
+      console.log("[ChoreScheduler] WebSocket failed:", wsError);
       // Fallback: Get from sensor attributes
       try {
         const sensor = this.hass.states["sensor.chore_scheduler_next_chore"];
+        console.log("[ChoreScheduler] Trying sensor fallback:", sensor);
         if (sensor?.attributes?.chores) {
           this._chores = sensor.attributes.chores as Chore[];
         } else {
@@ -213,9 +217,13 @@ export class ChoreSchedulerCard extends LitElement {
       return "";
     }
 
-    const names = assignment.assignees.map((a) =>
-      a.split(".").pop()?.replace(/_/g, " ") || a
-    );
+    const names = assignment.assignees
+      .filter((a): a is string => a != null)
+      .map((a) => a.split(".").pop()?.replace(/_/g, " ") || a);
+
+    if (!names.length) {
+      return "";
+    }
 
     if (assignment.mode === "rotating") {
       const currentIndex = assignment.current_index || 0;
@@ -260,21 +268,29 @@ export class ChoreSchedulerCard extends LitElement {
   private async _handleChoreSave(e: CustomEvent): Promise<void> {
     const { chore, isNew } = e.detail;
 
+    console.log("[ChoreScheduler] Saving chore:", { chore, isNew });
+
     try {
       if (isNew) {
+        console.log("[ChoreScheduler] Calling add_chore service...");
         await this.hass.callService(DOMAIN, "add_chore", chore);
+        console.log("[ChoreScheduler] add_chore service completed");
       } else {
+        console.log("[ChoreScheduler] Calling update_chore service...");
         await this.hass.callService(DOMAIN, "update_chore", {
           chore_id: chore.id,
           ...chore,
         });
+        console.log("[ChoreScheduler] update_chore service completed");
       }
 
       this._closeEditor();
       // Reload chores after save
+      console.log("[ChoreScheduler] Reloading chores...");
       await this._loadChores();
+      console.log("[ChoreScheduler] Chores reloaded:", this._chores);
     } catch (error) {
-      console.error("Error saving chore:", error);
+      console.error("[ChoreScheduler] Error saving chore:", error);
       // Show error to user
       alert(`Failed to save chore: ${error instanceof Error ? error.message : String(error)}`);
     }

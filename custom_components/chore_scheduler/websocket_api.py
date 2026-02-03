@@ -83,7 +83,9 @@ def _get_store(hass: HomeAssistant) -> ChoreStore | None:
     """Get the chore store from hass data."""
     domain_data = hass.data.get(DOMAIN, {})
     for entry_data in domain_data.values():
-        store = entry_data.get("store")
-        if store:
-            return store
+        # Skip non-dict entries (e.g., "frontend_registered": True)
+        if isinstance(entry_data, dict):
+            store = entry_data.get("store")
+            if store:
+                return store
     return None
