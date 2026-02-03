@@ -5,7 +5,7 @@ DOMAIN: Final = "chore_scheduler"
 
 # Storage
 STORAGE_KEY: Final = f"{DOMAIN}.chores"
-STORAGE_VERSION: Final = 1
+STORAGE_VERSION: Final = 2
 
 # Schedule types
 SCHEDULE_ONCE: Final = "once"
@@ -44,8 +44,8 @@ WEEKDAYS: Final = [
     "sunday",
 ]
 
-# Config
-CONF_DEFAULT_TODO_LIST: Final = "default_todo_list"
+# Events
+EVENT_CHORE_COMPLETED: Final = f"{DOMAIN}_chore_completed"
 
 # Attributes
 ATTR_CHORE_ID: Final = "chore_id"
@@ -53,7 +53,6 @@ ATTR_NAME: Final = "name"
 ATTR_DESCRIPTION: Final = "description"
 ATTR_SCHEDULE: Final = "schedule"
 ATTR_ASSIGNMENT: Final = "assignment"
-ATTR_TARGET_TODO_LIST: Final = "target_todo_list"
 ATTR_NOTIFICATIONS: Final = "notifications"
 ATTR_ENABLED: Final = "enabled"
 

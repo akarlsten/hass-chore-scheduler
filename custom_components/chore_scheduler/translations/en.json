@@ -3,18 +3,11 @@
     "step": {
       "user": {
         "title": "Set up chore scheduler",
-        "description": "Select the default todo list for chores. You can override this per-chore later.",
-        "data": {
-          "default_todo_list": "Default todo list"
-        }
+        "description": "Chore Scheduler will create a todo list entity to track your chores."
       }
     },
-    "error": {
-      "invalid_todo_list": "The selected todo list is not available."
-    },
     "abort": {
-      "already_configured": "Chore scheduler is already configured.",
-      "no_todo_lists": "No todo lists found. Please set up a todo integration first (e.g., Local to-do)."
+      "already_configured": "Chore scheduler is already configured."
     }
   },
   "entity": {
@@ -24,6 +17,11 @@
       },
       "next_chore": {
         "name": "Next chore"
+      }
+    },
+    "todo": {
+      "chores": {
+        "name": "Chores"
       }
     }
   },
@@ -47,10 +45,6 @@
         "assignment": {
           "name": "Assignment",
           "description": "Assignment configuration (mode, assignees)."
-        },
-        "target_todo_list": {
-          "name": "Target todo list",
-          "description": "The todo list entity to add items to."
         },
         "notifications": {
           "name": "Notifications",

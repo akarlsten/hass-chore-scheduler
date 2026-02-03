@@ -17,7 +17,6 @@ from .const import (
     SCHEDULE_DAILY,
     SCHEDULE_WEEKLY,
     SCHEDULE_MONTHLY,
-    CONF_DEFAULT_TODO_LIST,
 )
 from .store import ChoreStore
 
@@ -242,24 +241,6 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def async_trigger_chore(self, chore: dict[str, Any]) -> None:
         """Trigger a chore - create todo and send notification."""
-        # Get target todo list
-        target_list = chore.get("target_todo_list") or self.entry.data.get(
-            CONF_DEFAULT_TODO_LIST
-        )
-
-        if not target_list:
-            _LOGGER.warning(
-                "No todo list configured for chore: %s", chore["name"]
-            )
-            return
-
-        # Check for existing todo (deduplication)
-        if await self._todo_exists(target_list, chore["name"]):
-            _LOGGER.debug(
-                "Todo already exists for chore: %s", chore["name"]
-            )
-            return
-
         # Get current assignee if rotating
         assignee = None
         assignment = chore.get("assignment", {})
@@ -276,8 +257,24 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             assignee_name = assignee.split(".")[-1].replace("_", " ").title()
             summary = f"{chore['name']} ({assignee_name})"
 
-        # Create todo item
-        await self._create_todo(target_list, summary, chore.get("description"))
+        # Send notification (independent of todo creation)
+        await self._send_notification(chore, assignee)
+
+        # Create todo item in our own todo list (dedup check)
+        if not self.store.todo_item_exists_for_chore(chore["id"]):
+            await self.store.async_add_todo_item(
+                summary=summary,
+                chore_id=chore["id"],
+                description=chore.get("description"),
+            )
+            _LOGGER.info("Created todo: %s", summary)
+
+            # Notify the todo entity to update HA state
+            self._notify_todo_entity()
+        else:
+            _LOGGER.debug(
+                "Todo already exists for chore: %s", chore["name"]
+            )
 
         # Update last triggered
         await self.store.async_set_last_triggered(
@@ -290,60 +287,14 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             await self.store.async_update_chore(chore["id"], {"enabled": False})
             _LOGGER.info("Auto-disabled one-time chore: %s", chore["name"])
 
-        # Send notification
-        await self._send_notification(chore, assignee)
-
-    async def _todo_exists(self, todo_list: str, item_name: str) -> bool:
-        """Check if a todo item already exists."""
-        try:
-            result = await self.hass.services.async_call(
-                "todo",
-                "get_items",
-                {"entity_id": todo_list},
-                blocking=True,
-                return_response=True,
-            )
-
-            if result and todo_list in result:
-                items = result[todo_list].get("items", [])
-                for item in items:
-                    # Check if item exists and is not completed
-                    if (
-                        item.get("summary", "").startswith(item_name.split(" (")[0])
-                        and item.get("status") != "completed"
-                    ):
-                        return True
-
-        except Exception as err:
-            _LOGGER.error("Error checking for existing todo: %s", err)
-
-        return False
-
-    async def _create_todo(
-        self,
-        todo_list: str,
-        summary: str,
-        description: str | None = None,
-    ) -> None:
-        """Create a todo item."""
-        try:
-            service_data: dict[str, Any] = {
-                "entity_id": todo_list,
-                "item": summary,
-            }
-            if description:
-                service_data["description"] = description
-
-            await self.hass.services.async_call(
-                "todo",
-                "add_item",
-                service_data,
-                blocking=True,
-            )
-            _LOGGER.info("Created todo: %s", summary)
-
-        except Exception as err:
-            _LOGGER.error("Error creating todo: %s", err)
+    def _notify_todo_entity(self) -> None:
+        """Notify the todo entity to update its HA state."""
+        for entry_data in self.hass.data.get(DOMAIN, {}).values():
+            if isinstance(entry_data, dict):
+                todo_entity = entry_data.get("todo_entity")
+                if todo_entity:
+                    todo_entity.async_write_ha_state()
+                    break
 
     async def _send_notification(
         self,
@@ -358,6 +309,7 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         notify_targets = notifications.get("notify_targets", [])
         if not notify_targets:
+            _LOGGER.debug("No notify targets for chore: %s", chore["name"])
             return
 
         message = f"Time to: {chore['name']}"
@@ -365,12 +317,31 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             message += f"\n{chore['description']}"
 
         for target in notify_targets:
+            # Handle persistent_notification separately
+            if target == "persistent_notification":
+                await self._send_persistent_notification(chore)
+                continue
+
             try:
-                # Target format: "notify.mobile_app_xxx"
-                service_name = target.split(".", 1)[-1] if "." in target else target
+                # Target format: "notify.mobile_app_xxx" or "mobile_app_xxx"
+                if "." in target:
+                    domain, service_name = target.split(".", 1)
+                else:
+                    domain = "notify"
+                    service_name = target
+
+                # Verify service exists before calling
+                if not self.hass.services.has_service(domain, service_name):
+                    _LOGGER.warning(
+                        "Notify service %s.%s not found for chore: %s",
+                        domain,
+                        service_name,
+                        chore["name"],
+                    )
+                    continue
 
                 await self.hass.services.async_call(
-                    "notify",
+                    domain,
                     service_name,
                     {
                         "title": "Chore Reminder",
@@ -382,9 +353,48 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     },
                     blocking=True,
                 )
-                _LOGGER.debug("Sent notification for: %s", chore["name"])
+                _LOGGER.info(
+                    "Sent notification for chore '%s' to %s.%s",
+                    chore["name"],
+                    domain,
+                    service_name,
+                )
 
             except Exception as err:
                 _LOGGER.error(
-                    "Error sending notification to %s: %s", target, err
+                    "Failed to send notification to %s for chore '%s': %s",
+                    target,
+                    chore["name"],
+                    err,
+                    exc_info=True,
                 )
+
+    async def _send_persistent_notification(
+        self, chore: dict[str, Any]
+    ) -> None:
+        """Send a persistent notification for a chore."""
+        try:
+            message = f"Time to: {chore['name']}"
+            if chore.get("description"):
+                message += f"\n{chore['description']}"
+
+            await self.hass.services.async_call(
+                "persistent_notification",
+                "create",
+                {
+                    "title": f"Chore: {chore['name']}",
+                    "message": message,
+                    "notification_id": f"chore_{chore['id']}",
+                },
+                blocking=True,
+            )
+            _LOGGER.info(
+                "Sent persistent notification for chore: %s", chore["name"]
+            )
+        except Exception as err:
+            _LOGGER.error(
+                "Failed to send persistent notification for chore '%s': %s",
+                chore["name"],
+                err,
+                exc_info=True,
+            )

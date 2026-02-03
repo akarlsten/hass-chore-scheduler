@@ -6,11 +6,11 @@ export declare class ChoreSchedulerCardEditor extends LitElement {
     static styles: import("lit").CSSResult;
     setConfig(config: ChoreSchedulerCardConfig): void;
     protected render(): import("lit-html").TemplateResult<1>;
-    private _getTodoEntities;
     private _titleChanged;
-    private _todoListChanged;
+    private _defaultModeChanged;
     private _showDisabledChanged;
-    private _showNextDueChanged;
+    private _showCompletedChanged;
+    private _enableAnimationsChanged;
     private _updateConfig;
     private _fireConfigChanged;
 }

@@ -21,7 +21,6 @@ from .const import (
     ATTR_DESCRIPTION,
     ATTR_SCHEDULE,
     ATTR_ASSIGNMENT,
-    ATTR_TARGET_TODO_LIST,
     ATTR_NOTIFICATIONS,
     ATTR_ENABLED,
     SERVICE_ADD_CHORE,
@@ -36,7 +35,7 @@ from .websocket_api import async_register_websocket_api
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.SENSOR]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.TODO]
 
 # Service schemas
 ADD_CHORE_SCHEMA = vol.Schema(
@@ -45,7 +44,6 @@ ADD_CHORE_SCHEMA = vol.Schema(
         vol.Optional(ATTR_DESCRIPTION, default=""): cv.string,
         vol.Optional(ATTR_SCHEDULE): dict,
         vol.Optional(ATTR_ASSIGNMENT): dict,
-        vol.Optional(ATTR_TARGET_TODO_LIST): cv.string,
         vol.Optional(ATTR_NOTIFICATIONS): dict,
         vol.Optional(ATTR_ENABLED, default=True): cv.boolean,
     }
@@ -58,7 +56,6 @@ UPDATE_CHORE_SCHEMA = vol.Schema(
         vol.Optional(ATTR_DESCRIPTION): cv.string,
         vol.Optional(ATTR_SCHEDULE): dict,
         vol.Optional(ATTR_ASSIGNMENT): dict,
-        vol.Optional(ATTR_TARGET_TODO_LIST): cv.string,
         vol.Optional(ATTR_NOTIFICATIONS): dict,
         vol.Optional(ATTR_ENABLED): cv.boolean,
     }
@@ -137,7 +134,6 @@ async def _async_register_services(
             description=call.data.get(ATTR_DESCRIPTION, ""),
             schedule=call.data.get(ATTR_SCHEDULE),
             assignment=call.data.get(ATTR_ASSIGNMENT),
-            target_todo_list=call.data.get(ATTR_TARGET_TODO_LIST),
             notifications=call.data.get(ATTR_NOTIFICATIONS),
             enabled=call.data.get(ATTR_ENABLED, True),
         )

@@ -31,13 +31,6 @@ add_chore:
       example: '{"mode": "rotating", "assignees": ["person.adam", "person.partner"]}'
       selector:
         object:
-    target_todo_list:
-      name: Target Todo List
-      description: The todo list entity to add items to.
-      required: false
-      selector:
-        entity:
-          domain: todo
     notifications:
       name: Notifications
       description: Notification configuration.
@@ -88,13 +81,6 @@ update_chore:
       required: false
       selector:
         object:
-    target_todo_list:
-      name: Target Todo List
-      description: New target todo list.
-      required: false
-      selector:
-        entity:
-          domain: todo
     notifications:
       name: Notifications
       description: New notification configuration.

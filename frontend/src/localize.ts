@@ -65,6 +65,18 @@ const translations: Record<string, Record<string, string>> = {
     "display.daily_at": "Daily at {time}",
     "display.monthly_at": "Monthly on day {day} at {time}",
     "display.at_time": "At {time}",
+
+    // Display mode
+    "mode.display": "View",
+    "mode.manage": "Manage",
+    "display.overdue": "Overdue",
+    "display.today": "Today",
+    "display.upcoming": "Upcoming",
+    "display.done": "Done",
+    "display.all_done": "All chores done!",
+    "display.no_pending": "No pending chores",
+    "display.empty_todos": "No chores scheduled yet.",
+    "display.streak": "{count} day streak",
   },
   sv: {
     // Card
@@ -130,6 +142,18 @@ const translations: Record<string, Record<string, string>> = {
     "display.daily_at": "Dagligen kl {time}",
     "display.monthly_at": "Månadsvis dag {day} kl {time}",
     "display.at_time": "Kl {time}",
+
+    // Display mode
+    "mode.display": "Visa",
+    "mode.manage": "Hantera",
+    "display.overdue": "Försenade",
+    "display.today": "Idag",
+    "display.upcoming": "Kommande",
+    "display.done": "Klart",
+    "display.all_done": "Alla sysslor klara!",
+    "display.no_pending": "Inga väntande sysslor",
+    "display.empty_todos": "Inga sysslor schemalagda ännu.",
+    "display.streak": "{count} dagars svit",
   },
 };
 

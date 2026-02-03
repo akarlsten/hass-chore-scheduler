@@ -11,7 +11,6 @@ export declare class ChoreEditor extends LitElement {
     private _scheduleDayOfMonth;
     private _scheduleDate;
     private _selectedAssignee;
-    private _targetTodoList;
     private _notificationsEnabled;
     private _notifyTargets;
     private _persistentNotification;

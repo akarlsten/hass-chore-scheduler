@@ -1,6 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, ChoreSchedulerCardConfig, HassEntity } from "./types";
+import { HomeAssistant, ChoreSchedulerCardConfig } from "./types";
 
 @customElement("chore-scheduler-card-editor")
 export class ChoreSchedulerCardEditor extends LitElement {
@@ -45,8 +45,6 @@ export class ChoreSchedulerCardEditor extends LitElement {
       return html``;
     }
 
-    const todoEntities = this._getTodoEntities();
-
     return html`
       <div class="form-group">
         <ha-textfield
@@ -58,19 +56,13 @@ export class ChoreSchedulerCardEditor extends LitElement {
 
       <div class="form-group">
         <ha-select
-          label="Default todo list"
-          .value=${this._config.default_todo_list || ""}
-          @selected=${this._todoListChanged}
+          label="Default mode"
+          .value=${this._config.default_mode || "display"}
+          @selected=${this._defaultModeChanged}
           @closed=${(e: Event) => e.stopPropagation()}
         >
-          <ha-list-item value="">Use integration default</ha-list-item>
-          ${todoEntities.map(
-            (entity) => html`
-              <ha-list-item .value=${entity.entity_id}>
-                ${entity.attributes.friendly_name || entity.entity_id}
-              </ha-list-item>
-            `
-          )}
+          <ha-list-item value="display">Display (view todos)</ha-list-item>
+          <ha-list-item value="manage">Manage (edit chores)</ha-list-item>
         </ha-select>
       </div>
 
@@ -84,20 +76,22 @@ export class ChoreSchedulerCardEditor extends LitElement {
         </div>
 
         <div class="switch-row">
-          <span class="switch-label">Show next due date</span>
+          <span class="switch-label">Show completed todos</span>
           <ha-switch
-            .checked=${this._config.show_next_due !== false}
-            @change=${this._showNextDueChanged}
+            .checked=${this._config.show_completed === true}
+            @change=${this._showCompletedChanged}
+          ></ha-switch>
+        </div>
+
+        <div class="switch-row">
+          <span class="switch-label">Enable animations</span>
+          <ha-switch
+            .checked=${this._config.enable_animations !== false}
+            @change=${this._enableAnimationsChanged}
           ></ha-switch>
         </div>
       </div>
     `;
-  }
-
-  private _getTodoEntities(): HassEntity[] {
-    return Object.values(this.hass.states).filter((entity) =>
-      entity.entity_id.startsWith("todo.")
-    );
   }
 
   private _titleChanged(e: InputEvent): void {
@@ -105,16 +99,10 @@ export class ChoreSchedulerCardEditor extends LitElement {
     this._updateConfig({ title: target.value });
   }
 
-  private _todoListChanged(e: CustomEvent): void {
+  private _defaultModeChanged(e: CustomEvent): void {
     const value = e.detail.value;
     if (value) {
-      this._updateConfig({ default_todo_list: value });
-    } else {
-      // Remove the key if empty
-      const newConfig = { ...this._config };
-      delete newConfig.default_todo_list;
-      this._config = newConfig as ChoreSchedulerCardConfig;
-      this._fireConfigChanged();
+      this._updateConfig({ default_mode: value });
     }
   }
 
@@ -123,9 +111,14 @@ export class ChoreSchedulerCardEditor extends LitElement {
     this._updateConfig({ show_disabled: target.checked });
   }
 
-  private _showNextDueChanged(e: Event): void {
+  private _showCompletedChanged(e: Event): void {
     const target = e.target as HTMLInputElement;
-    this._updateConfig({ show_next_due: target.checked });
+    this._updateConfig({ show_completed: target.checked });
+  }
+
+  private _enableAnimationsChanged(e: Event): void {
+    const target = e.target as HTMLInputElement;
+    this._updateConfig({ enable_animations: target.checked });
   }
 
   private _updateConfig(updates: Partial<ChoreSchedulerCardConfig>): void {

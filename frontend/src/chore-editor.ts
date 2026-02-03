@@ -35,7 +35,7 @@ export class ChoreEditor extends LitElement {
   @state() private _scheduleDayOfMonth = 1;
   @state() private _scheduleDate = ""; // For "once" schedule type
   @state() private _selectedAssignee: string | null = null;
-  @state() private _targetTodoList = "";
+  // target_todo_list removed - integration now manages its own todo entity
   @state() private _notificationsEnabled = false;
   @state() private _notifyTargets: string[] = [];
   @state() private _persistentNotification = false;
@@ -452,7 +452,6 @@ export class ChoreEditor extends LitElement {
         this._selectedAssignee = assignment.assignees[0];
       }
 
-      this._targetTodoList = this.chore.target_todo_list || "";
       this._notificationsEnabled = this.chore.notifications.enabled;
       this._notifyTargets = [...(this.chore.notifications.notify_targets || [])];
       this._persistentNotification = this._notifyTargets.includes("persistent_notification");
@@ -471,7 +470,6 @@ export class ChoreEditor extends LitElement {
     this._scheduleDayOfMonth = 1;
     this._scheduleDate = this._getTodayDate();
     this._selectedAssignee = null;
-    this._targetTodoList = "";
     this._notificationsEnabled = false;
     this._notifyTargets = [];
     this._persistentNotification = false;
@@ -846,10 +844,6 @@ export class ChoreEditor extends LitElement {
       assignment,
       notifications,
     };
-
-    if (this._targetTodoList) {
-      choreData.target_todo_list = this._targetTodoList;
-    }
 
     if (this.chore) {
       choreData.id = this.chore.id;

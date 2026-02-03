@@ -36,12 +36,17 @@ export interface LovelaceCardConfig {
   [key: string]: unknown;
 }
 
+// Card mode
+export type CardMode = "display" | "manage";
+
 // Chore Scheduler types
 export interface ChoreSchedulerCardConfig extends LovelaceCardConfig {
   title?: string;
   show_disabled?: boolean;
   show_next_due?: boolean;
-  default_todo_list?: string;
+  default_mode?: CardMode;
+  show_completed?: boolean;
+  enable_animations?: boolean;
 }
 
 export type ScheduleType = "once" | "daily" | "weekly" | "monthly" | "custom";
@@ -84,14 +89,39 @@ export interface Chore {
   description: string;
   schedule: ChoreSchedule;
   assignment: ChoreAssignment;
-  target_todo_list: string | null;
   notifications: ChoreNotifications;
   enabled: boolean;
   last_triggered: string | null;
 }
 
+export interface CompletionStats {
+  last_completed: string | null;
+  streak: number;
+  total_completions: number;
+}
+
+export interface TodoItem {
+  uid: string;
+  summary: string;
+  status: "needs_action" | "completed";
+  description?: string;
+  due?: string;
+  chore_id: string;
+  created_at: string;
+  completed_at?: string;
+  // Enriched fields from websocket
+  chore_name?: string;
+  schedule_type?: string;
+  assignment?: ChoreAssignment;
+  completion_stats?: CompletionStats;
+}
+
 export interface ListChoresResponse {
   chores: Chore[];
+}
+
+export interface ListTodosResponse {
+  items: TodoItem[];
 }
 
 // Editor event types

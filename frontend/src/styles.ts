@@ -23,16 +23,25 @@ export const cardStyles = css`
     color: var(--primary-text-color);
   }
 
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
   .add-button {
     --mdc-theme-primary: var(--primary-color);
   }
 
   .add-button ha-icon,
+  .mode-toggle ha-icon,
   .chore-actions ha-icon-button ha-icon {
     display: flex;
     align-items: center;
     justify-content: center;
   }
+
+  /* ── Manage Mode: Chore List ─────────────────────────── */
 
   .chore-list {
     display: flex;
@@ -60,8 +69,9 @@ export const cardStyles = css`
   }
 
   .chore-icon {
-    margin-right: 16px;
+    margin-right: 12px;
     color: var(--primary-color);
+    --mdc-icon-size: 24px;
   }
 
   .chore-info {
@@ -77,22 +87,222 @@ export const cardStyles = css`
     text-overflow: ellipsis;
   }
 
-  .chore-schedule {
-    font-size: 0.875rem;
-    color: var(--secondary-text-color);
+  .chore-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     margin-top: 4px;
-  }
-
-  .chore-assignee {
-    font-size: 0.75rem;
-    color: var(--secondary-text-color);
-    margin-top: 2px;
+    flex-wrap: wrap;
   }
 
   .chore-actions {
     display: flex;
     gap: 4px;
   }
+
+  /* ── Schedule Pills ──────────────────────────────────── */
+
+  .schedule-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .schedule-pill.daily {
+    background: rgba(76, 175, 80, 0.15);
+    color: var(--label-badge-green, #4caf50);
+  }
+
+  .schedule-pill.weekly {
+    background: rgba(33, 150, 243, 0.15);
+    color: var(--label-badge-blue, #2196f3);
+  }
+
+  .schedule-pill.monthly {
+    background: rgba(156, 39, 176, 0.15);
+    color: var(--label-badge-purple, #9c27b0);
+  }
+
+  .schedule-pill.once {
+    background: rgba(255, 152, 0, 0.15);
+    color: var(--label-badge-yellow, #ff9800);
+  }
+
+  /* ── Assignee Avatars ────────────────────────────────── */
+
+  .assignee-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--secondary-background-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--primary-text-color);
+  }
+
+  .assignee-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ── Streak Badge ────────────────────────────────────── */
+
+  .streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--warning-color, #ff9800);
+    white-space: nowrap;
+  }
+
+  .streak-badge ha-icon {
+    --mdc-icon-size: 14px;
+  }
+
+  /* ── Display Mode: Todo List ─────────────────────────── */
+
+  .todo-section {
+    margin-bottom: 12px;
+  }
+
+  .todo-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .section-header {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--secondary-text-color);
+    padding: 4px 0 8px 0;
+  }
+
+  .todo-section.overdue .section-header {
+    color: var(--error-color, #f44336);
+  }
+
+  .todo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .todo-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 8px;
+    gap: 8px;
+    transition: background-color 0.15s, opacity 0.3s;
+  }
+
+  .todo-item:hover {
+    background: var(--secondary-background-color);
+  }
+
+  .todo-item.overdue {
+    border-left: 3px solid var(--error-color, #f44336);
+  }
+
+  .todo-item.completed {
+    opacity: 0.5;
+  }
+
+  .todo-checkbox {
+    --mdc-icon-size: 22px;
+    cursor: pointer;
+    color: var(--secondary-text-color);
+    transition: color 0.15s, transform 0.15s;
+    flex-shrink: 0;
+  }
+
+  .todo-checkbox:hover {
+    color: var(--primary-color);
+  }
+
+  .todo-item.completed .todo-checkbox {
+    color: var(--success-color, #4caf50);
+    cursor: default;
+  }
+
+  .todo-icon {
+    --mdc-icon-size: 18px;
+    color: var(--secondary-text-color);
+    flex-shrink: 0;
+  }
+
+  .todo-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .todo-summary {
+    font-size: 0.9rem;
+    color: var(--primary-text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+
+  .todo-item.completed .todo-summary {
+    text-decoration: line-through;
+    color: var(--secondary-text-color);
+  }
+
+  /* ── Animations ──────────────────────────────────────── */
+
+  @keyframes checkmark-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+  }
+
+  .todo-checkbox.completing {
+    animation: checkmark-pop 0.3s ease-out;
+    color: var(--success-color, #4caf50);
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── All Done Celebration ────────────────────────────── */
+
+  .all-done {
+    text-align: center;
+    padding: 32px 16px;
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .all-done ha-icon {
+    --mdc-icon-size: 48px;
+    color: var(--success-color, #4caf50);
+    margin-bottom: 12px;
+  }
+
+  .all-done p {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--primary-text-color);
+    margin: 0;
+  }
+
+  /* ── Empty State ─────────────────────────────────────── */
 
   .empty-state {
     text-align: center;
@@ -110,6 +320,17 @@ export const cardStyles = css`
     display: flex;
     justify-content: center;
     padding: 32px;
+  }
+
+  /* ── Reduced Motion ──────────────────────────────────── */
+
+  @media (prefers-reduced-motion: reduce) {
+    .todo-checkbox.completing {
+      animation: none;
+    }
+    .all-done {
+      animation: none;
+    }
   }
 `;
 

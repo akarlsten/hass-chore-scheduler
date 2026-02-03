@@ -3,18 +3,11 @@
     "step": {
       "user": {
         "title": "Konfigurera sysslor",
-        "description": "Välj standardlista för sysslor. Du kan ändra detta per syssla senare.",
-        "data": {
-          "default_todo_list": "Standard att-göra-lista"
-        }
+        "description": "Sysslor skapar en att-göra-lista för att hantera dina sysslor."
       }
     },
-    "error": {
-      "invalid_todo_list": "Den valda att-göra-listan är inte tillgänglig."
-    },
     "abort": {
-      "already_configured": "Sysslor är redan konfigurerat.",
-      "no_todo_lists": "Inga att-göra-listor hittades. Konfigurera en att-göra-integration först (t.ex. Lokal att-göra)."
+      "already_configured": "Sysslor är redan konfigurerat."
     }
   },
   "entity": {
@@ -24,6 +17,11 @@
       },
       "next_chore": {
         "name": "Nästa syssla"
+      }
+    },
+    "todo": {
+      "chores": {
+        "name": "Sysslor"
       }
     }
   },
@@ -47,10 +45,6 @@
         "assignment": {
           "name": "Tilldelning",
           "description": "Tilldelningskonfiguration (läge, tilldelade)."
-        },
-        "target_todo_list": {
-          "name": "Mål att-göra-lista",
-          "description": "Att-göra-listan där uppgifter läggs till."
         },
         "notifications": {
           "name": "Notifieringar",
