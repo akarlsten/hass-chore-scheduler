@@ -5,7 +5,7 @@ DOMAIN: Final = "chore_scheduler"
 
 # Storage
 STORAGE_KEY: Final = f"{DOMAIN}.chores"
-STORAGE_VERSION: Final = 2
+STORAGE_VERSION: Final = 1
 
 # Schedule types
 SCHEDULE_ONCE: Final = "once"

@@ -15,7 +15,7 @@ const ICON_RULES: IconRule[] = [
   // Cleaning / Städning
   {
     keywords: ["vacuum", "dammsug", "dammsu"],
-    icon: "mdi:robot-vacuum",
+    icon: "mdi:vacuum",
   },
   {
     keywords: ["mop", "mopp", "skur"],
@@ -88,7 +88,14 @@ const ICON_RULES: IconRule[] = [
 
   // Outdoor / Utomhus
   {
-    keywords: ["lawn", "gräsmatta", "grasmatta", "mow", "klipp gräs", "gräsklipp"],
+    keywords: [
+      "lawn",
+      "gräsmatta",
+      "grasmatta",
+      "mow",
+      "klipp gräs",
+      "gräsklipp",
+    ],
     icon: "mdi:mower-bag",
   },
   {

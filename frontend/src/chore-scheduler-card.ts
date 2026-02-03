@@ -35,7 +35,6 @@ export class ChoreSchedulerCard extends LitElement {
   @state() private _editingChore: Chore | null = null;
   @state() private _showEditor = false;
   @state() private _mode: CardMode = "display";
-  @state() private _showAllDone = false;
 
   static styles = cardStyles;
 
@@ -104,22 +103,20 @@ export class ChoreSchedulerCard extends LitElement {
         <div class="card-header">
           <h1>${this._config.title}</h1>
           <div class="header-actions">
-            <ha-icon-button
-              class="mode-toggle"
-              @click=${this._toggleMode}
-              title=${this._mode === "display"
-                ? localize("mode.manage", this.hass)
-                : localize("mode.display", this.hass)}
-            >
-              <ha-icon icon=${this._mode === "display" ? "mdi:pencil" : "mdi:eye"}></ha-icon>
-            </ha-icon-button>
             ${this._mode === "manage"
               ? html`
-                  <ha-icon-button class="add-button" @click=${this._addChore}>
+                  <button class="header-btn" @click=${this._addChore}>
                     <ha-icon icon="mdi:plus"></ha-icon>
-                  </ha-icon-button>
+                    ${localize("action.add", this.hass)}
+                  </button>
                 `
               : nothing}
+            <button class="header-btn" @click=${this._toggleMode}>
+              <ha-icon icon=${this._mode === "display" ? "mdi:pencil" : "mdi:eye"}></ha-icon>
+              ${this._mode === "display"
+                ? localize("action.edit_chores", this.hass)
+                : localize("action.show_chores", this.hass)}
+            </button>
           </div>
         </div>
 
@@ -167,16 +164,6 @@ export class ChoreSchedulerCard extends LitElement {
     const overdue = pending.filter((i) => i.due && i.due < today);
     const todayItems = pending.filter((i) => !i.due || i.due === today);
     const upcoming = pending.filter((i) => i.due && i.due > today);
-
-    // Show all-done celebration
-    if (this._showAllDone) {
-      return html`
-        <div class="all-done">
-          <ha-icon icon="mdi:party-popper"></ha-icon>
-          <p>${localize("display.all_done", this.hass)}</p>
-        </div>
-      `;
-    }
 
     if (pending.length === 0 && completed.length > 0) {
       return html`
@@ -295,18 +282,6 @@ export class ChoreSchedulerCard extends LitElement {
       // Revert optimistic update
       await this._loadData();
       return;
-    }
-
-    // Check if all today's items are done
-    const today = new Date().toISOString().split("T")[0];
-    const pendingToday = this._todoItems.filter(
-      (i) => i.status === "needs_action" && (!i.due || i.due <= today)
-    );
-    if (pendingToday.length === 0) {
-      this._showAllDone = true;
-      setTimeout(() => {
-        this._showAllDone = false;
-      }, 3000);
     }
 
     // Reload to get updated stats

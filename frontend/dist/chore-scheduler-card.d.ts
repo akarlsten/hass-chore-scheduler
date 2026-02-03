@@ -19,7 +19,6 @@ export declare class ChoreSchedulerCard extends LitElement {
     private _editingChore;
     private _showEditor;
     private _mode;
-    private _showAllDone;
     static styles: import("lit").CSSResult;
     setConfig(config: LovelaceCardConfig): void;
     getCardSize(): number;

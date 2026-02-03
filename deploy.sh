@@ -25,12 +25,11 @@ echo "   Copying custom_components/chore_scheduler to ${HA_HOST}:${HA_CONFIG}/cu
 
 scp -P ${HA_PORT} -r custom_components/chore_scheduler ${HA_HOST}:${HA_CONFIG}/custom_components/
 
+# Restart HA core
+echo "4. Restarting Home Assistant..."
+ssh -p ${HA_PORT} ${HA_HOST} "ha core restart"
+
 echo ""
 echo "=== Deployment Complete ==="
 echo ""
-echo "Next steps:"
-echo "1. Restart Home Assistant (Settings > System > Restart)"
-echo "2. Add the integration: Settings > Devices & Services > Add Integration > Chore Scheduler"
-echo "3. Add the card to a dashboard:"
-echo "   type: custom:chore-scheduler-card"
-echo "   title: Household Chores"
+echo "HA is restarting. Give it a minute, then hard-refresh your browser (Ctrl+Shift+R)."

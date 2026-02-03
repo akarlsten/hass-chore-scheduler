@@ -18,3 +18,4 @@ All initial items have been implemented.
 - Statistics dashboard (completion rates, streaks over time)
 - Automation triggers on chore completion events
 - Additional language support
+- Google Home / Nest Hub display integration (HA Cloud exposure, casting HA dashboard, or Google Keep sync)

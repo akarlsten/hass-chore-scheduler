@@ -26,15 +26,39 @@ export const cardStyles = css`
   .header-actions {
     display: flex;
     align-items: center;
+    gap: 8px;
+  }
+
+  .header-btn {
+    display: inline-flex;
+    align-items: center;
     gap: 4px;
+    padding: 6px 12px;
+    border: 1px solid var(--divider-color);
+    border-radius: 18px;
+    background: transparent;
+    color: var(--primary-text-color);
+    font-size: 0.8rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    white-space: nowrap;
   }
 
-  .add-button {
-    --mdc-theme-primary: var(--primary-color);
+  .header-btn:hover {
+    background: var(--secondary-background-color);
+    border-color: var(--primary-color);
   }
 
-  .add-button ha-icon,
-  .mode-toggle ha-icon,
+  .header-btn:active {
+    background: rgba(var(--rgb-primary-color, 3, 169, 244), 0.12);
+  }
+
+  .header-btn ha-icon {
+    --mdc-icon-size: 16px;
+    display: flex;
+  }
+
   .chore-actions ha-icon-button ha-icon {
     display: flex;
     align-items: center;

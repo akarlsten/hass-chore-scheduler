@@ -44,16 +44,15 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
         self.store = store
         self.entry = entry
-        self._processed_today: set[str] = set()
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Check for due chores and create todos."""
         now = dt_util.now()
         chores = self.store.get_chores()
 
-        # Reset processed set at midnight
-        if now.hour == 0 and now.minute == 0:
-            self._processed_today.clear()
+        _LOGGER.debug(
+            "Checking %d chores at %s", len(chores), now.strftime("%H:%M:%S")
+        )
 
         due_chores = []
         next_chore = None
@@ -63,18 +62,26 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             if not chore.get("enabled", True):
                 continue
 
-            is_due, scheduled_time = self._check_if_due(chore, now)
+            try:
+                is_due, scheduled_time = self._check_if_due(chore, now)
 
-            if is_due and chore["id"] not in self._processed_today:
-                due_chores.append(chore)
-                self._processed_today.add(chore["id"])
-                await self.async_trigger_chore(chore)
+                if is_due:
+                    due_chores.append(chore)
+                    _LOGGER.info(
+                        "Chore '%s' is due, triggering", chore["name"]
+                    )
+                    await self.async_trigger_chore(chore)
 
-            # Track next upcoming chore
-            if scheduled_time and scheduled_time > now:
-                if next_chore_time is None or scheduled_time < next_chore_time:
-                    next_chore = chore
-                    next_chore_time = scheduled_time
+                # Track next upcoming chore
+                if scheduled_time and scheduled_time > now:
+                    if next_chore_time is None or scheduled_time < next_chore_time:
+                        next_chore = chore
+                        next_chore_time = scheduled_time
+
+            except Exception:
+                _LOGGER.exception(
+                    "Error processing chore '%s'", chore.get("name", "?")
+                )
 
         return {
             "chores": chores,
@@ -83,10 +90,29 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             "next_chore_time": next_chore_time,
         }
 
+    def _already_triggered_today(
+        self, chore: dict[str, Any], now: datetime
+    ) -> bool:
+        """Check if a chore was already triggered today."""
+        last_triggered = chore.get("last_triggered")
+        if not last_triggered:
+            return False
+        try:
+            last_dt = datetime.fromisoformat(last_triggered)
+            return last_dt.date() == now.date()
+        except (ValueError, TypeError):
+            return False
+
     def _check_if_due(
         self, chore: dict[str, Any], now: datetime
     ) -> tuple[bool, datetime | None]:
-        """Check if a chore is due now."""
+        """Check if a chore is due.
+
+        A chore is due when:
+        1. The scheduled time has passed (now >= scheduled time)
+        2. It hasn't already been triggered today (based on last_triggered)
+        3. The schedule matches today (correct day of week/month/date)
+        """
         schedule = chore.get("schedule", {})
         schedule_type = schedule.get("type", SCHEDULE_WEEKLY)
         scheduled_time_str = schedule.get("time", "10:00")
@@ -101,21 +127,22 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             hour=hour, minute=minute, second=0, microsecond=0
         )
 
-        # Check if we're within the trigger window (same minute)
-        is_trigger_time = (
-            now.hour == hour
-            and now.minute == minute
-        )
+        # Has the scheduled time passed today?
+        time_has_passed = now >= scheduled_today
+
+        # Was this chore already triggered today?
+        already_done = self._already_triggered_today(chore, now)
 
         if schedule_type == SCHEDULE_ONCE:
-            # One-time chores trigger on the specified date and time
             scheduled_date_str = schedule.get("date")
             if scheduled_date_str:
                 try:
-                    scheduled_date = datetime.strptime(scheduled_date_str, "%Y-%m-%d").date()
-                    if now.date() == scheduled_date and is_trigger_time:
+                    scheduled_date = datetime.strptime(
+                        scheduled_date_str, "%Y-%m-%d"
+                    ).date()
+                    if now.date() == scheduled_date and time_has_passed and not already_done:
                         return True, scheduled_today
-                    # Build next occurrence datetime
+                    # Build next occurrence datetime for tracking
                     scheduled_dt = now.replace(
                         year=scheduled_date.year,
                         month=scheduled_date.month,
@@ -129,29 +156,35 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 except ValueError:
                     pass
             # Fallback: trigger at specified time today if no date set
-            return is_trigger_time, scheduled_today
+            if time_has_passed and not already_done:
+                return True, scheduled_today
+            return False, scheduled_today if not time_has_passed else None
 
         if schedule_type == SCHEDULE_DAILY:
-            return is_trigger_time, scheduled_today
+            if time_has_passed and not already_done:
+                return True, scheduled_today
+            # Next occurrence is tomorrow if already passed
+            if time_has_passed:
+                return False, scheduled_today + timedelta(days=1)
+            return False, scheduled_today
 
-        elif schedule_type == SCHEDULE_WEEKLY:
+        if schedule_type == SCHEDULE_WEEKLY:
             days = schedule.get("days", ["sunday"])
             current_day = now.strftime("%A").lower()
 
-            if current_day in days and is_trigger_time:
+            if current_day in days and time_has_passed and not already_done:
                 return True, scheduled_today
 
             # Find next occurrence
             next_time = self._find_next_weekly(now, days, hour, minute)
             return False, next_time
 
-        elif schedule_type == SCHEDULE_MONTHLY:
+        if schedule_type == SCHEDULE_MONTHLY:
             day_of_month = schedule.get("day_of_month", 1)
-            # Clamp to last day of current month (e.g., day 31 -> day 30 in April)
             last_day_of_month = calendar.monthrange(now.year, now.month)[1]
             effective_day = min(day_of_month, last_day_of_month)
 
-            if now.day == effective_day and is_trigger_time:
+            if now.day == effective_day and time_has_passed and not already_done:
                 return True, scheduled_today
 
             # Find next occurrence
@@ -187,7 +220,7 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             hour=hour, minute=minute, second=0, microsecond=0
         )
 
-        # Check remaining days this week
+        # Check remaining days this week (including today if time hasn't passed)
         for days_ahead in range(7):
             check_weekday = (current_weekday + days_ahead) % 7
             if check_weekday in target_weekdays:
@@ -209,7 +242,6 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         minute: int,
     ) -> datetime | None:
         """Find the next occurrence for a monthly schedule."""
-        # Clamp to last day of current month
         last_day_this_month = calendar.monthrange(now.year, now.month)[1]
         effective_day = min(day_of_month, last_day_this_month)
 
@@ -224,7 +256,7 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         if scheduled_time > now:
             return scheduled_time
 
-        # Move to next month and clamp again
+        # Move to next month
         if now.month == 12:
             next_year, next_month = now.year + 1, 1
         else:
@@ -236,11 +268,13 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         return scheduled_time.replace(
             year=next_year,
             month=next_month,
-            day=effective_day_next
+            day=effective_day_next,
         )
 
     async def async_trigger_chore(self, chore: dict[str, Any]) -> None:
         """Trigger a chore - create todo and send notification."""
+        _LOGGER.info("Triggering chore: %s", chore["name"])
+
         # Get current assignee if rotating
         assignee = None
         assignment = chore.get("assignment", {})
@@ -253,7 +287,6 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         # Build todo item summary
         summary = chore["name"]
         if assignee:
-            # Extract person name from entity_id like "person.adam"
             assignee_name = assignee.split(".")[-1].replace("_", " ").title()
             summary = f"{chore['name']} ({assignee_name})"
 
@@ -284,7 +317,7 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         # Auto-disable "once" chores after triggering
         schedule = chore.get("schedule", {})
         if schedule.get("type") == SCHEDULE_ONCE:
-            await self.store.async_update_chore(chore["id"], {"enabled": False})
+            await self.store.async_update_chore(chore["id"], enabled=False)
             _LOGGER.info("Auto-disabled one-time chore: %s", chore["name"])
 
     def _notify_todo_entity(self) -> None:

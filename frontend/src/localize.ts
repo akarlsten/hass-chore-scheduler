@@ -66,6 +66,11 @@ const translations: Record<string, Record<string, string>> = {
     "display.monthly_at": "Monthly on day {day} at {time}",
     "display.at_time": "At {time}",
 
+    // Header buttons
+    "action.edit_chores": "Edit chores",
+    "action.show_chores": "Show chores",
+    "action.add": "Add",
+
     // Display mode
     "mode.display": "View",
     "mode.manage": "Manage",
@@ -142,6 +147,11 @@ const translations: Record<string, Record<string, string>> = {
     "display.daily_at": "Dagligen kl {time}",
     "display.monthly_at": "Månadsvis dag {day} kl {time}",
     "display.at_time": "Kl {time}",
+
+    // Header buttons
+    "action.edit_chores": "Ändra sysslor",
+    "action.show_chores": "Visa sysslor",
+    "action.add": "Lägg till",
 
     // Display mode
     "mode.display": "Visa",

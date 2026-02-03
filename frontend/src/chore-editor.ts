@@ -591,10 +591,7 @@ export class ChoreEditor extends LitElement {
                 </div>
                 <ha-switch
                   .checked=${this._notificationsEnabled}
-                  @change=${(e: Event) => {
-                    e.stopPropagation();
-                    this._notificationsEnabled = (e.target as HTMLInputElement).checked;
-                  }}
+                  @click=${(e: Event) => e.stopPropagation()}
                 ></ha-switch>
               </div>
 
@@ -611,10 +608,7 @@ export class ChoreEditor extends LitElement {
                     </div>
                     <ha-checkbox
                       .checked=${this._persistentNotification}
-                      @change=${(e: Event) => {
-                        e.stopPropagation();
-                        this._persistentNotification = (e.target as HTMLInputElement).checked;
-                      }}
+                      @click=${(e: Event) => e.stopPropagation()}
                     ></ha-checkbox>
                   </div>
 
@@ -632,10 +626,7 @@ export class ChoreEditor extends LitElement {
                           </div>
                           <ha-checkbox
                             .checked=${this._notifyTargets.includes(device.service)}
-                            @change=${(e: Event) => {
-                              e.stopPropagation();
-                              this._toggleNotifyTarget(device.service);
-                            }}
+                            @click=${(e: Event) => e.stopPropagation()}
                           ></ha-checkbox>
                         </div>
                       `)}
