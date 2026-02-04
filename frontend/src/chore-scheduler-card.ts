@@ -149,7 +149,10 @@ export class ChoreSchedulerCard extends LitElement {
 
   private _renderDisplayMode() {
     const pending = this._todoItems.filter((i) => i.status === "needs_action");
-    const completed = this._todoItems.filter((i) => i.status === "completed");
+    const completed = this._todoItems
+      .filter((i) => i.status === "completed")
+      .sort((a, b) => (b.completed_at ?? "").localeCompare(a.completed_at ?? ""))
+      .slice(0, 3);
 
     if (pending.length === 0 && completed.length === 0) {
       return html`
@@ -259,33 +262,51 @@ export class ChoreSchedulerCard extends LitElement {
   }
 
   private async _handleComplete(item: TodoItem): Promise<void> {
-    // Optimistic update
-    this._todoItems = this._todoItems.map((i) =>
-      i.uid === item.uid ? { ...i, status: "completed" as const, completed_at: new Date().toISOString() } : i
-    );
+    const animate = this._config?.enable_animations !== false;
+    const row = this.shadowRoot?.querySelector(`#todo-${item.uid}`) as HTMLElement | null;
+    const checkbox = row?.querySelector(".todo-checkbox") as HTMLElement | null;
 
-    // Animations
-    if (this._config?.enable_animations !== false) {
-      const el = this.shadowRoot?.querySelector(`#todo-${item.uid} .todo-checkbox`) as HTMLElement;
-      if (el) playCheckmarkPop(el);
+    // 1. Play checkmark pop + haptic immediately (before any state change)
+    if (animate && checkbox) {
+      playCheckmarkPop(checkbox);
       triggerHaptic();
     }
 
-    // Send to backend
-    try {
-      await this.hass.connection.sendMessagePromise({
-        type: "chore_scheduler/complete_todo",
-        uid: item.uid,
+    // 2. Send to backend (don't wait for animation)
+    const backendPromise = this.hass.connection
+      .sendMessagePromise({ type: "chore_scheduler/complete_todo", uid: item.uid })
+      .catch((err: unknown) => {
+        console.error("[ChoreScheduler] Failed to complete todo:", err);
+        return "error" as const;
       });
-    } catch (err) {
-      console.error("[ChoreScheduler] Failed to complete todo:", err);
-      // Revert optimistic update
+
+    // 3. After the pop finishes, fade the row out
+    if (animate && row) {
+      // Wait for checkmark pop (0.3s) then start row fade-out
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          row.classList.add("completing-item");
+          row.addEventListener("animationend", () => resolve(), { once: true });
+          // Safety timeout in case animationend doesn't fire
+          setTimeout(resolve, 500);
+        }, 280);
+      });
+    }
+
+    // 4. Check backend result
+    const result = await backendPromise;
+    if (result === "error") {
       await this._loadData();
       return;
     }
 
-    // Reload to get updated stats
-    setTimeout(() => this._loadData(), 500);
+    // 5. Now update state (the item is already visually gone)
+    this._todoItems = this._todoItems.map((i) =>
+      i.uid === item.uid ? { ...i, status: "completed" as const, completed_at: new Date().toISOString() } : i
+    );
+
+    // 6. Reload for updated stats
+    setTimeout(() => this._loadData(), 300);
   }
 
   // ── Manage Mode ───────────────────────────────────────────────────

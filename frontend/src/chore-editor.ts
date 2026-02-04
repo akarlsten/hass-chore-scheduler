@@ -41,6 +41,26 @@ export class ChoreEditor extends LitElement {
   @state() private _persistentNotification = false;
 
   static styles = css`
+    @keyframes overlay-fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes overlay-fade-out {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    @keyframes dialog-enter {
+      from { opacity: 0; transform: translateY(24px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes dialog-exit {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(24px) scale(0.96); }
+    }
+
     .overlay {
       position: fixed;
       inset: 0;
@@ -51,6 +71,11 @@ export class ChoreEditor extends LitElement {
       z-index: 999;
       padding: 12px;
       box-sizing: border-box;
+      animation: overlay-fade-in 0.2s ease-out;
+    }
+
+    .overlay.closing {
+      animation: overlay-fade-out 0.2s ease-in forwards;
     }
 
     .dialog {
@@ -63,6 +88,20 @@ export class ChoreEditor extends LitElement {
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      animation: dialog-enter 0.25s ease-out;
+    }
+
+    .overlay.closing .dialog {
+      animation: dialog-exit 0.2s ease-in forwards;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .overlay,
+      .overlay.closing,
+      .dialog,
+      .overlay.closing .dialog {
+        animation: none;
+      }
     }
 
     .dialog-header {
@@ -788,11 +827,34 @@ export class ChoreEditor extends LitElement {
   }
 
   private _handleOverlayClick(): void {
-    this._handleCancel();
+    this._animateClose();
   }
 
   private _handleCancel(): void {
-    this.dispatchEvent(new CustomEvent("editor-close", { bubbles: true, composed: true }));
+    this._animateClose();
+  }
+
+  private _closing = false;
+
+  private _animateClose(): void {
+    if (this._closing) return;
+    this._closing = true;
+
+    const overlay = this.shadowRoot?.querySelector(".overlay") as HTMLElement | null;
+    const emit = () => {
+      this.dispatchEvent(new CustomEvent("editor-close", { bubbles: true, composed: true }));
+    };
+
+    if (overlay && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      overlay.classList.add("closing");
+      // Listen only on overlay itself, not bubbled events from dialog child
+      overlay.addEventListener("animationend", (e) => {
+        if (e.target === overlay) emit();
+      }, { once: true });
+      setTimeout(emit, 300); // safety
+    } else {
+      emit();
+    }
   }
 
   private _handleSave(): void {

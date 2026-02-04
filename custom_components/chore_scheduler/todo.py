@@ -15,7 +15,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN
+from .const import DOMAIN, SCHEDULE_ONCE
 from .coordinator import ChoreSchedulerCoordinator
 from .store import ChoreStore
 
@@ -153,6 +153,24 @@ class ChoreSchedulerTodoList(TodoListEntity):
                     )
 
         await self._store.async_update_todo_item(item.uid, **updates)
+
+        # Auto-remove one-time chores after completion
+        if (
+            item.status is not None
+            and item.status == TodoItemStatus.COMPLETED
+            and not was_completed
+        ):
+            chore_id = existing.get("chore_id")
+            if chore_id:
+                chore = self._store.get_chore(chore_id)
+                if chore and chore.get("schedule", {}).get("type") == SCHEDULE_ONCE:
+                    await self._store.async_delete_todo_items([item.uid])
+                    await self._store.async_delete_chore(chore_id)
+                    _LOGGER.info(
+                        "Auto-removed one-time chore after completion: %s",
+                        existing.get("summary"),
+                    )
+
         self.async_write_ha_state()
 
     async def async_delete_todo_items(self, uids: list[str]) -> None:

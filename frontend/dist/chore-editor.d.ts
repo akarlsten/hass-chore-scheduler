@@ -32,6 +32,8 @@ export declare class ChoreEditor extends LitElement {
     private _toggleNotifyTarget;
     private _handleOverlayClick;
     private _handleCancel;
+    private _closing;
+    private _animateClose;
     private _handleSave;
     private _handleDelete;
 }

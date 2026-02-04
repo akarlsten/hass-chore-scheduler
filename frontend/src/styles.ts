@@ -71,6 +71,7 @@ export const cardStyles = css`
     display: flex;
     flex-direction: column;
     gap: 8px;
+    animation: fade-in 0.2s ease-out;
   }
 
   .chore-item {
@@ -291,7 +292,7 @@ export const cardStyles = css`
 
   @keyframes checkmark-pop {
     0% { transform: scale(1); }
-    50% { transform: scale(1.4); }
+    40% { transform: scale(1.4); }
     100% { transform: scale(1); }
   }
 
@@ -301,16 +302,49 @@ export const cardStyles = css`
   }
 
   @keyframes fade-in {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Item completing: pop the check, then fade out the row */
+  @keyframes item-fade-out {
+    0% { opacity: 1; max-height: 60px; padding-top: 10px; padding-bottom: 10px; margin-bottom: 0; }
+    50% { opacity: 0; max-height: 60px; padding-top: 10px; padding-bottom: 10px; margin-bottom: 0; }
+    100% { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; margin-bottom: -4px; }
+  }
+
+  .todo-item.completing-item {
+    animation: item-fade-out 0.45s ease-out forwards;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .todo-item.completing-item .todo-checkbox {
+    color: var(--success-color, #4caf50);
+  }
+
+  .todo-item.completing-item .todo-summary {
+    text-decoration: line-through;
+    color: var(--secondary-text-color);
+  }
+
+  /* Sections and content areas entering - only on the list container,
+     not individual items, to avoid re-animating on every state update */
+  .todo-list {
+    animation: fade-in 0.2s ease-out both;
   }
 
   /* ── All Done Celebration ────────────────────────────── */
 
+  @keyframes celebrate-in {
+    from { opacity: 0; transform: scale(0.9) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
   .all-done {
     text-align: center;
     padding: 32px 16px;
-    animation: fade-in 0.3s ease-out;
+    animation: celebrate-in 0.4s ease-out;
   }
 
   .all-done ha-icon {
@@ -332,6 +366,7 @@ export const cardStyles = css`
     text-align: center;
     padding: 32px 16px;
     color: var(--secondary-text-color);
+    animation: fade-in 0.3s ease-out;
   }
 
   .empty-state ha-icon {
@@ -349,10 +384,12 @@ export const cardStyles = css`
   /* ── Reduced Motion ──────────────────────────────────── */
 
   @media (prefers-reduced-motion: reduce) {
-    .todo-checkbox.completing {
-      animation: none;
-    }
-    .all-done {
+    .todo-checkbox.completing,
+    .all-done,
+    .todo-item.completing-item,
+    .todo-list,
+    .empty-state,
+    .chore-list {
       animation: none;
     }
   }

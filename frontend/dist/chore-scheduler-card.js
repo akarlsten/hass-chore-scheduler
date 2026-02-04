@@ -1,4 +1,4 @@
-function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPropertyDescriptor(t,i):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)a=Reflect.decorate(e,t,i,s);else for(var n=e.length-1;n>=0;n--)(o=e[n])&&(a=(r<3?o(a):r>3?o(t,i,a):o(t,i))||a);return r>3&&a&&Object.defineProperty(t,i,a),a}"function"==typeof SuppressedError&&SuppressedError;const t=globalThis,i=t.ShadowRoot&&(void 0===t.ShadyCSS||t.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s=Symbol(),o=new WeakMap;let r=class{constructor(e,t,i){if(this._$cssResult$=!0,i!==s)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o;const t=this.t;if(i&&void 0===e){const i=void 0!==t&&1===t.length;i&&(e=o.get(t)),void 0===e&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),i&&o.set(t,e))}return e}toString(){return this.cssText}};const a=(e,...t)=>{const i=1===e.length?e[0]:t.reduce((t,i,s)=>t+(e=>{if(!0===e._$cssResult$)return e.cssText;if("number"==typeof e)return e;throw Error("Value passed to 'css' function must be a 'css' function result: "+e+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+e[s+1],e[0]);return new r(i,e,s)},n=i?e=>e:e=>e instanceof CSSStyleSheet?(e=>{let t="";for(const i of e.cssRules)t+=i.cssText;return(e=>new r("string"==typeof e?e:e+"",void 0,s))(t)})(e):e,{is:d,defineProperty:c,getOwnPropertyDescriptor:l,getOwnPropertyNames:h,getOwnPropertySymbols:p,getPrototypeOf:m}=Object,u=globalThis,g=u.trustedTypes,y=g?g.emptyScript:"",f=u.reactiveElementPolyfillSupport,_=(e,t)=>e,v={toAttribute(e,t){switch(t){case Boolean:e=e?y:null;break;case Object:case Array:e=null==e?e:JSON.stringify(e)}return e},fromAttribute(e,t){let i=e;switch(t){case Boolean:i=null!==e;break;case Number:i=null===e?null:Number(e);break;case Object:case Array:try{i=JSON.parse(e)}catch(e){i=null}}return i}},b=(e,t)=>!d(e,t),x={attribute:!0,type:String,converter:v,reflect:!1,useDefault:!1,hasChanged:b};Symbol.metadata??=Symbol("metadata"),u.litPropertyMetadata??=new WeakMap;let $=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??=[]).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=x){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){const i=Symbol(),s=this.getPropertyDescriptor(e,i,t);void 0!==s&&c(this.prototype,e,s)}}static getPropertyDescriptor(e,t,i){const{get:s,set:o}=l(this.prototype,e)??{get(){return this[t]},set(e){this[t]=e}};return{get:s,set(t){const r=s?.call(this);o?.call(this,t),this.requestUpdate(e,r,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??x}static _$Ei(){if(this.hasOwnProperty(_("elementProperties")))return;const e=m(this);e.finalize(),void 0!==e.l&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(_("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(_("properties"))){const e=this.properties,t=[...h(e),...p(e)];for(const i of t)this.createProperty(i,e[i])}const e=this[Symbol.metadata];if(null!==e){const t=litPropertyMetadata.get(e);if(void 0!==t)for(const[e,i]of t)this.elementProperties.set(e,i)}this._$Eh=new Map;for(const[e,t]of this.elementProperties){const i=this._$Eu(e,t);void 0!==i&&this._$Eh.set(i,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){const t=[];if(Array.isArray(e)){const i=new Set(e.flat(1/0).reverse());for(const e of i)t.unshift(n(e))}else void 0!==e&&t.push(n(e));return t}static _$Eu(e,t){const i=t.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof e?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??=new Set).add(e),void 0!==this.renderRoot&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){const e=new Map,t=this.constructor.elementProperties;for(const i of t.keys())this.hasOwnProperty(i)&&(e.set(i,this[i]),delete this[i]);e.size>0&&(this._$Ep=e)}createRenderRoot(){const e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((e,s)=>{if(i)e.adoptedStyleSheets=s.map(e=>e instanceof CSSStyleSheet?e:e.styleSheet);else for(const i of s){const s=document.createElement("style"),o=t.litNonce;void 0!==o&&s.setAttribute("nonce",o),s.textContent=i.cssText,e.appendChild(s)}})(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,i){this._$AK(e,i)}_$ET(e,t){const i=this.constructor.elementProperties.get(e),s=this.constructor._$Eu(e,i);if(void 0!==s&&!0===i.reflect){const o=(void 0!==i.converter?.toAttribute?i.converter:v).toAttribute(t,i.type);this._$Em=e,null==o?this.removeAttribute(s):this.setAttribute(s,o),this._$Em=null}}_$AK(e,t){const i=this.constructor,s=i._$Eh.get(e);if(void 0!==s&&this._$Em!==s){const e=i.getPropertyOptions(s),o="function"==typeof e.converter?{fromAttribute:e.converter}:void 0!==e.converter?.fromAttribute?e.converter:v;this._$Em=s;const r=o.fromAttribute(t,e.type);this[s]=r??this._$Ej?.get(s)??r,this._$Em=null}}requestUpdate(e,t,i,s=!1,o){if(void 0!==e){const r=this.constructor;if(!1===s&&(o=this[e]),i??=r.getPropertyOptions(e),!((i.hasChanged??b)(o,t)||i.useDefault&&i.reflect&&o===this._$Ej?.get(e)&&!this.hasAttribute(r._$Eu(e,i))))return;this.C(e,t,i)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(e,t,{useDefault:i,reflect:s,wrapped:o},r){i&&!(this._$Ej??=new Map).has(e)&&(this._$Ej.set(e,r??t??this[e]),!0!==o||void 0!==r)||(this._$AL.has(e)||(this.hasUpdated||i||(t=void 0),this._$AL.set(e,t)),!0===s&&this._$Em!==e&&(this._$Eq??=new Set).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}const e=this.scheduleUpdate();return null!=e&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[e,t]of this._$Ep)this[e]=t;this._$Ep=void 0}const e=this.constructor.elementProperties;if(e.size>0)for(const[t,i]of e){const{wrapped:e}=i,s=this[t];!0!==e||this._$AL.has(t)||void 0===s||this.C(t,void 0,i,s)}}let e=!1;const t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(e=>e.hostUpdate?.()),this.update(t)):this._$EM()}catch(t){throw e=!1,this._$EM(),t}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(e=>e.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&=this._$Eq.forEach(e=>this._$ET(e,this[e])),this._$EM()}updated(e){}firstUpdated(e){}};$.elementStyles=[],$.shadowRootOptions={mode:"open"},$[_("elementProperties")]=new Map,$[_("finalized")]=new Map,f?.({ReactiveElement:$}),(u.reactiveElementVersions??=[]).push("2.1.2");const w=globalThis,k=e=>e,A=w.trustedTypes,S=A?A.createPolicy("lit-html",{createHTML:e=>e}):void 0,C="$lit$",E=`lit$${Math.random().toFixed(9).slice(2)}$`,T="?"+E,D=`<${T}>`,M=document,P=()=>M.createComment(""),O=e=>null===e||"object"!=typeof e&&"function"!=typeof e,N=Array.isArray,z="[ \t\n\f\r]",U=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,j=/-->/g,R=/>/g,H=RegExp(`>|${z}(?:([^\\s"'>=/]+)(${z}*=${z}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),I=/'/g,L=/"/g,F=/^(?:script|style|textarea|title)$/i,q=(e=>(t,...i)=>({_$litType$:e,strings:t,values:i}))(1),B=Symbol.for("lit-noChange"),W=Symbol.for("lit-nothing"),V=new WeakMap,K=M.createTreeWalker(M,129);function J(e,t){if(!N(e)||!e.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==S?S.createHTML(t):t}const Z=(e,t)=>{const i=e.length-1,s=[];let o,r=2===t?"<svg>":3===t?"<math>":"",a=U;for(let t=0;t<i;t++){const i=e[t];let n,d,c=-1,l=0;for(;l<i.length&&(a.lastIndex=l,d=a.exec(i),null!==d);)l=a.lastIndex,a===U?"!--"===d[1]?a=j:void 0!==d[1]?a=R:void 0!==d[2]?(F.test(d[2])&&(o=RegExp("</"+d[2],"g")),a=H):void 0!==d[3]&&(a=H):a===H?">"===d[0]?(a=o??U,c=-1):void 0===d[1]?c=-2:(c=a.lastIndex-d[2].length,n=d[1],a=void 0===d[3]?H:'"'===d[3]?L:I):a===L||a===I?a=H:a===j||a===R?a=U:(a=H,o=void 0);const h=a===H&&e[t+1].startsWith("/>")?" ":"";r+=a===U?i+D:c>=0?(s.push(n),i.slice(0,c)+C+i.slice(c)+E+h):i+E+(-2===c?t:h)}return[J(e,r+(e[i]||"<?>")+(2===t?"</svg>":3===t?"</math>":"")),s]};class G{constructor({strings:e,_$litType$:t},i){let s;this.parts=[];let o=0,r=0;const a=e.length-1,n=this.parts,[d,c]=Z(e,t);if(this.el=G.createElement(d,i),K.currentNode=this.el.content,2===t||3===t){const e=this.el.content.firstChild;e.replaceWith(...e.childNodes)}for(;null!==(s=K.nextNode())&&n.length<a;){if(1===s.nodeType){if(s.hasAttributes())for(const e of s.getAttributeNames())if(e.endsWith(C)){const t=c[r++],i=s.getAttribute(e).split(E),a=/([.?@])?(.*)/.exec(t);n.push({type:1,index:o,name:a[2],strings:i,ctor:"."===a[1]?te:"?"===a[1]?ie:"@"===a[1]?se:ee}),s.removeAttribute(e)}else e.startsWith(E)&&(n.push({type:6,index:o}),s.removeAttribute(e));if(F.test(s.tagName)){const e=s.textContent.split(E),t=e.length-1;if(t>0){s.textContent=A?A.emptyScript:"";for(let i=0;i<t;i++)s.append(e[i],P()),K.nextNode(),n.push({type:2,index:++o});s.append(e[t],P())}}}else if(8===s.nodeType)if(s.data===T)n.push({type:2,index:o});else{let e=-1;for(;-1!==(e=s.data.indexOf(E,e+1));)n.push({type:7,index:o}),e+=E.length-1}o++}}static createElement(e,t){const i=M.createElement("template");return i.innerHTML=e,i}}function Q(e,t,i=e,s){if(t===B)return t;let o=void 0!==s?i._$Co?.[s]:i._$Cl;const r=O(t)?void 0:t._$litDirective$;return o?.constructor!==r&&(o?._$AO?.(!1),void 0===r?o=void 0:(o=new r(e),o._$AT(e,i,s)),void 0!==s?(i._$Co??=[])[s]=o:i._$Cl=o),void 0!==o&&(t=Q(e,o._$AS(e,t.values),o,s)),t}class X{constructor(e,t){this._$AV=[],this._$AN=void 0,this._$AD=e,this._$AM=t}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(e){const{el:{content:t},parts:i}=this._$AD,s=(e?.creationScope??M).importNode(t,!0);K.currentNode=s;let o=K.nextNode(),r=0,a=0,n=i[0];for(;void 0!==n;){if(r===n.index){let t;2===n.type?t=new Y(o,o.nextSibling,this,e):1===n.type?t=new n.ctor(o,n.name,n.strings,this,e):6===n.type&&(t=new oe(o,this,e)),this._$AV.push(t),n=i[++a]}r!==n?.index&&(o=K.nextNode(),r++)}return K.currentNode=M,s}p(e){let t=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(e,i,t),t+=i.strings.length-2):i._$AI(e[t])),t++}}class Y{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(e,t,i,s){this.type=2,this._$AH=W,this._$AN=void 0,this._$AA=e,this._$AB=t,this._$AM=i,this.options=s,this._$Cv=s?.isConnected??!0}get parentNode(){let e=this._$AA.parentNode;const t=this._$AM;return void 0!==t&&11===e?.nodeType&&(e=t.parentNode),e}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(e,t=this){e=Q(this,e,t),O(e)?e===W||null==e||""===e?(this._$AH!==W&&this._$AR(),this._$AH=W):e!==this._$AH&&e!==B&&this._(e):void 0!==e._$litType$?this.$(e):void 0!==e.nodeType?this.T(e):(e=>N(e)||"function"==typeof e?.[Symbol.iterator])(e)?this.k(e):this._(e)}O(e){return this._$AA.parentNode.insertBefore(e,this._$AB)}T(e){this._$AH!==e&&(this._$AR(),this._$AH=this.O(e))}_(e){this._$AH!==W&&O(this._$AH)?this._$AA.nextSibling.data=e:this.T(M.createTextNode(e)),this._$AH=e}$(e){const{values:t,_$litType$:i}=e,s="number"==typeof i?this._$AC(e):(void 0===i.el&&(i.el=G.createElement(J(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===s)this._$AH.p(t);else{const e=new X(s,this),i=e.u(this.options);e.p(t),this.T(i),this._$AH=e}}_$AC(e){let t=V.get(e.strings);return void 0===t&&V.set(e.strings,t=new G(e)),t}k(e){N(this._$AH)||(this._$AH=[],this._$AR());const t=this._$AH;let i,s=0;for(const o of e)s===t.length?t.push(i=new Y(this.O(P()),this.O(P()),this,this.options)):i=t[s],i._$AI(o),s++;s<t.length&&(this._$AR(i&&i._$AB.nextSibling,s),t.length=s)}_$AR(e=this._$AA.nextSibling,t){for(this._$AP?.(!1,!0,t);e!==this._$AB;){const t=k(e).nextSibling;k(e).remove(),e=t}}setConnected(e){void 0===this._$AM&&(this._$Cv=e,this._$AP?.(e))}}class ee{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(e,t,i,s,o){this.type=1,this._$AH=W,this._$AN=void 0,this.element=e,this.name=t,this._$AM=s,this.options=o,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=W}_$AI(e,t=this,i,s){const o=this.strings;let r=!1;if(void 0===o)e=Q(this,e,t,0),r=!O(e)||e!==this._$AH&&e!==B,r&&(this._$AH=e);else{const s=e;let a,n;for(e=o[0],a=0;a<o.length-1;a++)n=Q(this,s[i+a],t,a),n===B&&(n=this._$AH[a]),r||=!O(n)||n!==this._$AH[a],n===W?e=W:e!==W&&(e+=(n??"")+o[a+1]),this._$AH[a]=n}r&&!s&&this.j(e)}j(e){e===W?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,e??"")}}class te extends ee{constructor(){super(...arguments),this.type=3}j(e){this.element[this.name]=e===W?void 0:e}}class ie extends ee{constructor(){super(...arguments),this.type=4}j(e){this.element.toggleAttribute(this.name,!!e&&e!==W)}}class se extends ee{constructor(e,t,i,s,o){super(e,t,i,s,o),this.type=5}_$AI(e,t=this){if((e=Q(this,e,t,0)??W)===B)return;const i=this._$AH,s=e===W&&i!==W||e.capture!==i.capture||e.once!==i.once||e.passive!==i.passive,o=e!==W&&(i===W||s);s&&this.element.removeEventListener(this.name,this,i),o&&this.element.addEventListener(this.name,this,e),this._$AH=e}handleEvent(e){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,e):this._$AH.handleEvent(e)}}class oe{constructor(e,t,i){this.element=e,this.type=6,this._$AN=void 0,this._$AM=t,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(e){Q(this,e)}}const re=w.litHtmlPolyfillSupport;re?.(G,Y),(w.litHtmlVersions??=[]).push("3.3.2");const ae=globalThis;class ne extends ${constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const e=super.createRenderRoot();return this.renderOptions.renderBefore??=e.firstChild,e}update(e){const t=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(e),this._$Do=((e,t,i)=>{const s=i?.renderBefore??t;let o=s._$litPart$;if(void 0===o){const e=i?.renderBefore??null;s._$litPart$=o=new Y(t.insertBefore(P(),e),e,void 0,i??{})}return o._$AI(e),o})(t,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return B}}ne._$litElement$=!0,ne.finalized=!0,ae.litElementHydrateSupport?.({LitElement:ne});const de=ae.litElementPolyfillSupport;de?.({LitElement:ne}),(ae.litElementVersions??=[]).push("4.2.2");const ce=e=>(t,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(e,t)}):customElements.define(e,t)},le={attribute:!0,type:String,converter:v,reflect:!1,hasChanged:b},he=(e=le,t,i)=>{const{kind:s,metadata:o}=i;let r=globalThis.litPropertyMetadata.get(o);if(void 0===r&&globalThis.litPropertyMetadata.set(o,r=new Map),"setter"===s&&((e=Object.create(e)).wrapped=!0),r.set(i.name,e),"accessor"===s){const{name:s}=i;return{set(i){const o=t.get.call(this);t.set.call(this,i),this.requestUpdate(s,o,e,!0,i)},init(t){return void 0!==t&&this.C(s,void 0,e,t),t}}}if("setter"===s){const{name:s}=i;return function(i){const o=this[s];t.call(this,i),this.requestUpdate(s,o,e,!0,i)}}throw Error("Unsupported decorator location: "+s)};function pe(e){return(t,i)=>"object"==typeof i?he(e,t,i):((e,t,i)=>{const s=t.hasOwnProperty(i);return t.constructor.createProperty(i,e),s?Object.getOwnPropertyDescriptor(t,i):void 0})(e,t,i)}function me(e){return pe({...e,state:!0,attribute:!1})}const ue=a`
+function e(e,t,i,o){var s,a=arguments.length,r=a<3?t:null===o?o=Object.getOwnPropertyDescriptor(t,i):o;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)r=Reflect.decorate(e,t,i,o);else for(var n=e.length-1;n>=0;n--)(s=e[n])&&(r=(a<3?s(r):a>3?s(t,i,r):s(t,i))||r);return a>3&&r&&Object.defineProperty(t,i,r),r}"function"==typeof SuppressedError&&SuppressedError;const t=globalThis,i=t.ShadowRoot&&(void 0===t.ShadyCSS||t.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,o=Symbol(),s=new WeakMap;let a=class{constructor(e,t,i){if(this._$cssResult$=!0,i!==o)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o;const t=this.t;if(i&&void 0===e){const i=void 0!==t&&1===t.length;i&&(e=s.get(t)),void 0===e&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),i&&s.set(t,e))}return e}toString(){return this.cssText}};const r=(e,...t)=>{const i=1===e.length?e[0]:t.reduce((t,i,o)=>t+(e=>{if(!0===e._$cssResult$)return e.cssText;if("number"==typeof e)return e;throw Error("Value passed to 'css' function must be a 'css' function result: "+e+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+e[o+1],e[0]);return new a(i,e,o)},n=i?e=>e:e=>e instanceof CSSStyleSheet?(e=>{let t="";for(const i of e.cssRules)t+=i.cssText;return(e=>new a("string"==typeof e?e:e+"",void 0,o))(t)})(e):e,{is:d,defineProperty:c,getOwnPropertyDescriptor:l,getOwnPropertyNames:h,getOwnPropertySymbols:p,getPrototypeOf:m}=Object,u=globalThis,g=u.trustedTypes,y=g?g.emptyScript:"",f=u.reactiveElementPolyfillSupport,_=(e,t)=>e,v={toAttribute(e,t){switch(t){case Boolean:e=e?y:null;break;case Object:case Array:e=null==e?e:JSON.stringify(e)}return e},fromAttribute(e,t){let i=e;switch(t){case Boolean:i=null!==e;break;case Number:i=null===e?null:Number(e);break;case Object:case Array:try{i=JSON.parse(e)}catch(e){i=null}}return i}},b=(e,t)=>!d(e,t),x={attribute:!0,type:String,converter:v,reflect:!1,useDefault:!1,hasChanged:b};Symbol.metadata??=Symbol("metadata"),u.litPropertyMetadata??=new WeakMap;let w=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??=[]).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=x){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){const i=Symbol(),o=this.getPropertyDescriptor(e,i,t);void 0!==o&&c(this.prototype,e,o)}}static getPropertyDescriptor(e,t,i){const{get:o,set:s}=l(this.prototype,e)??{get(){return this[t]},set(e){this[t]=e}};return{get:o,set(t){const a=o?.call(this);s?.call(this,t),this.requestUpdate(e,a,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??x}static _$Ei(){if(this.hasOwnProperty(_("elementProperties")))return;const e=m(this);e.finalize(),void 0!==e.l&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(_("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(_("properties"))){const e=this.properties,t=[...h(e),...p(e)];for(const i of t)this.createProperty(i,e[i])}const e=this[Symbol.metadata];if(null!==e){const t=litPropertyMetadata.get(e);if(void 0!==t)for(const[e,i]of t)this.elementProperties.set(e,i)}this._$Eh=new Map;for(const[e,t]of this.elementProperties){const i=this._$Eu(e,t);void 0!==i&&this._$Eh.set(i,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){const t=[];if(Array.isArray(e)){const i=new Set(e.flat(1/0).reverse());for(const e of i)t.unshift(n(e))}else void 0!==e&&t.push(n(e));return t}static _$Eu(e,t){const i=t.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof e?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??=new Set).add(e),void 0!==this.renderRoot&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){const e=new Map,t=this.constructor.elementProperties;for(const i of t.keys())this.hasOwnProperty(i)&&(e.set(i,this[i]),delete this[i]);e.size>0&&(this._$Ep=e)}createRenderRoot(){const e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((e,o)=>{if(i)e.adoptedStyleSheets=o.map(e=>e instanceof CSSStyleSheet?e:e.styleSheet);else for(const i of o){const o=document.createElement("style"),s=t.litNonce;void 0!==s&&o.setAttribute("nonce",s),o.textContent=i.cssText,e.appendChild(o)}})(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,i){this._$AK(e,i)}_$ET(e,t){const i=this.constructor.elementProperties.get(e),o=this.constructor._$Eu(e,i);if(void 0!==o&&!0===i.reflect){const s=(void 0!==i.converter?.toAttribute?i.converter:v).toAttribute(t,i.type);this._$Em=e,null==s?this.removeAttribute(o):this.setAttribute(o,s),this._$Em=null}}_$AK(e,t){const i=this.constructor,o=i._$Eh.get(e);if(void 0!==o&&this._$Em!==o){const e=i.getPropertyOptions(o),s="function"==typeof e.converter?{fromAttribute:e.converter}:void 0!==e.converter?.fromAttribute?e.converter:v;this._$Em=o;const a=s.fromAttribute(t,e.type);this[o]=a??this._$Ej?.get(o)??a,this._$Em=null}}requestUpdate(e,t,i,o=!1,s){if(void 0!==e){const a=this.constructor;if(!1===o&&(s=this[e]),i??=a.getPropertyOptions(e),!((i.hasChanged??b)(s,t)||i.useDefault&&i.reflect&&s===this._$Ej?.get(e)&&!this.hasAttribute(a._$Eu(e,i))))return;this.C(e,t,i)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(e,t,{useDefault:i,reflect:o,wrapped:s},a){i&&!(this._$Ej??=new Map).has(e)&&(this._$Ej.set(e,a??t??this[e]),!0!==s||void 0!==a)||(this._$AL.has(e)||(this.hasUpdated||i||(t=void 0),this._$AL.set(e,t)),!0===o&&this._$Em!==e&&(this._$Eq??=new Set).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}const e=this.scheduleUpdate();return null!=e&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[e,t]of this._$Ep)this[e]=t;this._$Ep=void 0}const e=this.constructor.elementProperties;if(e.size>0)for(const[t,i]of e){const{wrapped:e}=i,o=this[t];!0!==e||this._$AL.has(t)||void 0===o||this.C(t,void 0,i,o)}}let e=!1;const t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(e=>e.hostUpdate?.()),this.update(t)):this._$EM()}catch(t){throw e=!1,this._$EM(),t}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(e=>e.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&=this._$Eq.forEach(e=>this._$ET(e,this[e])),this._$EM()}updated(e){}firstUpdated(e){}};w.elementStyles=[],w.shadowRootOptions={mode:"open"},w[_("elementProperties")]=new Map,w[_("finalized")]=new Map,f?.({ReactiveElement:w}),(u.reactiveElementVersions??=[]).push("2.1.2");const $=globalThis,k=e=>e,A=$.trustedTypes,S=A?A.createPolicy("lit-html",{createHTML:e=>e}):void 0,C="$lit$",E=`lit$${Math.random().toFixed(9).slice(2)}$`,T="?"+E,D=`<${T}>`,M=document,P=()=>M.createComment(""),O=e=>null===e||"object"!=typeof e&&"function"!=typeof e,N=Array.isArray,z="[ \t\n\f\r]",U=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,j=/-->/g,R=/>/g,I=RegExp(`>|${z}(?:([^\\s"'>=/]+)(${z}*=${z}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),H=/'/g,L=/"/g,q=/^(?:script|style|textarea|title)$/i,F=(e=>(t,...i)=>({_$litType$:e,strings:t,values:i}))(1),B=Symbol.for("lit-noChange"),W=Symbol.for("lit-nothing"),V=new WeakMap,Y=M.createTreeWalker(M,129);function K(e,t){if(!N(e)||!e.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==S?S.createHTML(t):t}const J=(e,t)=>{const i=e.length-1,o=[];let s,a=2===t?"<svg>":3===t?"<math>":"",r=U;for(let t=0;t<i;t++){const i=e[t];let n,d,c=-1,l=0;for(;l<i.length&&(r.lastIndex=l,d=r.exec(i),null!==d);)l=r.lastIndex,r===U?"!--"===d[1]?r=j:void 0!==d[1]?r=R:void 0!==d[2]?(q.test(d[2])&&(s=RegExp("</"+d[2],"g")),r=I):void 0!==d[3]&&(r=I):r===I?">"===d[0]?(r=s??U,c=-1):void 0===d[1]?c=-2:(c=r.lastIndex-d[2].length,n=d[1],r=void 0===d[3]?I:'"'===d[3]?L:H):r===L||r===H?r=I:r===j||r===R?r=U:(r=I,s=void 0);const h=r===I&&e[t+1].startsWith("/>")?" ":"";a+=r===U?i+D:c>=0?(o.push(n),i.slice(0,c)+C+i.slice(c)+E+h):i+E+(-2===c?t:h)}return[K(e,a+(e[i]||"<?>")+(2===t?"</svg>":3===t?"</math>":"")),o]};class Z{constructor({strings:e,_$litType$:t},i){let o;this.parts=[];let s=0,a=0;const r=e.length-1,n=this.parts,[d,c]=J(e,t);if(this.el=Z.createElement(d,i),Y.currentNode=this.el.content,2===t||3===t){const e=this.el.content.firstChild;e.replaceWith(...e.childNodes)}for(;null!==(o=Y.nextNode())&&n.length<r;){if(1===o.nodeType){if(o.hasAttributes())for(const e of o.getAttributeNames())if(e.endsWith(C)){const t=c[a++],i=o.getAttribute(e).split(E),r=/([.?@])?(.*)/.exec(t);n.push({type:1,index:s,name:r[2],strings:i,ctor:"."===r[1]?te:"?"===r[1]?ie:"@"===r[1]?oe:ee}),o.removeAttribute(e)}else e.startsWith(E)&&(n.push({type:6,index:s}),o.removeAttribute(e));if(q.test(o.tagName)){const e=o.textContent.split(E),t=e.length-1;if(t>0){o.textContent=A?A.emptyScript:"";for(let i=0;i<t;i++)o.append(e[i],P()),Y.nextNode(),n.push({type:2,index:++s});o.append(e[t],P())}}}else if(8===o.nodeType)if(o.data===T)n.push({type:2,index:s});else{let e=-1;for(;-1!==(e=o.data.indexOf(E,e+1));)n.push({type:7,index:s}),e+=E.length-1}s++}}static createElement(e,t){const i=M.createElement("template");return i.innerHTML=e,i}}function G(e,t,i=e,o){if(t===B)return t;let s=void 0!==o?i._$Co?.[o]:i._$Cl;const a=O(t)?void 0:t._$litDirective$;return s?.constructor!==a&&(s?._$AO?.(!1),void 0===a?s=void 0:(s=new a(e),s._$AT(e,i,o)),void 0!==o?(i._$Co??=[])[o]=s:i._$Cl=s),void 0!==s&&(t=G(e,s._$AS(e,t.values),s,o)),t}class Q{constructor(e,t){this._$AV=[],this._$AN=void 0,this._$AD=e,this._$AM=t}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(e){const{el:{content:t},parts:i}=this._$AD,o=(e?.creationScope??M).importNode(t,!0);Y.currentNode=o;let s=Y.nextNode(),a=0,r=0,n=i[0];for(;void 0!==n;){if(a===n.index){let t;2===n.type?t=new X(s,s.nextSibling,this,e):1===n.type?t=new n.ctor(s,n.name,n.strings,this,e):6===n.type&&(t=new se(s,this,e)),this._$AV.push(t),n=i[++r]}a!==n?.index&&(s=Y.nextNode(),a++)}return Y.currentNode=M,o}p(e){let t=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(e,i,t),t+=i.strings.length-2):i._$AI(e[t])),t++}}class X{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(e,t,i,o){this.type=2,this._$AH=W,this._$AN=void 0,this._$AA=e,this._$AB=t,this._$AM=i,this.options=o,this._$Cv=o?.isConnected??!0}get parentNode(){let e=this._$AA.parentNode;const t=this._$AM;return void 0!==t&&11===e?.nodeType&&(e=t.parentNode),e}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(e,t=this){e=G(this,e,t),O(e)?e===W||null==e||""===e?(this._$AH!==W&&this._$AR(),this._$AH=W):e!==this._$AH&&e!==B&&this._(e):void 0!==e._$litType$?this.$(e):void 0!==e.nodeType?this.T(e):(e=>N(e)||"function"==typeof e?.[Symbol.iterator])(e)?this.k(e):this._(e)}O(e){return this._$AA.parentNode.insertBefore(e,this._$AB)}T(e){this._$AH!==e&&(this._$AR(),this._$AH=this.O(e))}_(e){this._$AH!==W&&O(this._$AH)?this._$AA.nextSibling.data=e:this.T(M.createTextNode(e)),this._$AH=e}$(e){const{values:t,_$litType$:i}=e,o="number"==typeof i?this._$AC(e):(void 0===i.el&&(i.el=Z.createElement(K(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===o)this._$AH.p(t);else{const e=new Q(o,this),i=e.u(this.options);e.p(t),this.T(i),this._$AH=e}}_$AC(e){let t=V.get(e.strings);return void 0===t&&V.set(e.strings,t=new Z(e)),t}k(e){N(this._$AH)||(this._$AH=[],this._$AR());const t=this._$AH;let i,o=0;for(const s of e)o===t.length?t.push(i=new X(this.O(P()),this.O(P()),this,this.options)):i=t[o],i._$AI(s),o++;o<t.length&&(this._$AR(i&&i._$AB.nextSibling,o),t.length=o)}_$AR(e=this._$AA.nextSibling,t){for(this._$AP?.(!1,!0,t);e!==this._$AB;){const t=k(e).nextSibling;k(e).remove(),e=t}}setConnected(e){void 0===this._$AM&&(this._$Cv=e,this._$AP?.(e))}}class ee{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(e,t,i,o,s){this.type=1,this._$AH=W,this._$AN=void 0,this.element=e,this.name=t,this._$AM=o,this.options=s,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=W}_$AI(e,t=this,i,o){const s=this.strings;let a=!1;if(void 0===s)e=G(this,e,t,0),a=!O(e)||e!==this._$AH&&e!==B,a&&(this._$AH=e);else{const o=e;let r,n;for(e=s[0],r=0;r<s.length-1;r++)n=G(this,o[i+r],t,r),n===B&&(n=this._$AH[r]),a||=!O(n)||n!==this._$AH[r],n===W?e=W:e!==W&&(e+=(n??"")+s[r+1]),this._$AH[r]=n}a&&!o&&this.j(e)}j(e){e===W?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,e??"")}}class te extends ee{constructor(){super(...arguments),this.type=3}j(e){this.element[this.name]=e===W?void 0:e}}class ie extends ee{constructor(){super(...arguments),this.type=4}j(e){this.element.toggleAttribute(this.name,!!e&&e!==W)}}class oe extends ee{constructor(e,t,i,o,s){super(e,t,i,o,s),this.type=5}_$AI(e,t=this){if((e=G(this,e,t,0)??W)===B)return;const i=this._$AH,o=e===W&&i!==W||e.capture!==i.capture||e.once!==i.once||e.passive!==i.passive,s=e!==W&&(i===W||o);o&&this.element.removeEventListener(this.name,this,i),s&&this.element.addEventListener(this.name,this,e),this._$AH=e}handleEvent(e){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,e):this._$AH.handleEvent(e)}}class se{constructor(e,t,i){this.element=e,this.type=6,this._$AN=void 0,this._$AM=t,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(e){G(this,e)}}const ae=$.litHtmlPolyfillSupport;ae?.(Z,X),($.litHtmlVersions??=[]).push("3.3.2");const re=globalThis;class ne extends w{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const e=super.createRenderRoot();return this.renderOptions.renderBefore??=e.firstChild,e}update(e){const t=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(e),this._$Do=((e,t,i)=>{const o=i?.renderBefore??t;let s=o._$litPart$;if(void 0===s){const e=i?.renderBefore??null;o._$litPart$=s=new X(t.insertBefore(P(),e),e,void 0,i??{})}return s._$AI(e),s})(t,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return B}}ne._$litElement$=!0,ne.finalized=!0,re.litElementHydrateSupport?.({LitElement:ne});const de=re.litElementPolyfillSupport;de?.({LitElement:ne}),(re.litElementVersions??=[]).push("4.2.2");const ce=e=>(t,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(e,t)}):customElements.define(e,t)},le={attribute:!0,type:String,converter:v,reflect:!1,hasChanged:b},he=(e=le,t,i)=>{const{kind:o,metadata:s}=i;let a=globalThis.litPropertyMetadata.get(s);if(void 0===a&&globalThis.litPropertyMetadata.set(s,a=new Map),"setter"===o&&((e=Object.create(e)).wrapped=!0),a.set(i.name,e),"accessor"===o){const{name:o}=i;return{set(i){const s=t.get.call(this);t.set.call(this,i),this.requestUpdate(o,s,e,!0,i)},init(t){return void 0!==t&&this.C(o,void 0,e,t),t}}}if("setter"===o){const{name:o}=i;return function(i){const s=this[o];t.call(this,i),this.requestUpdate(o,s,e,!0,i)}}throw Error("Unsupported decorator location: "+o)};function pe(e){return(t,i)=>"object"==typeof i?he(e,t,i):((e,t,i)=>{const o=t.hasOwnProperty(i);return t.constructor.createProperty(i,e),o?Object.getOwnPropertyDescriptor(t,i):void 0})(e,t,i)}function me(e){return pe({...e,state:!0,attribute:!1})}const ue=r`
   :host {
     --mdc-theme-primary: var(--primary-color);
   }
@@ -69,6 +69,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     display: flex;
     flex-direction: column;
     gap: 8px;
+    animation: fade-in 0.2s ease-out;
   }
 
   .chore-item {
@@ -289,7 +290,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
 
   @keyframes checkmark-pop {
     0% { transform: scale(1); }
-    50% { transform: scale(1.4); }
+    40% { transform: scale(1.4); }
     100% { transform: scale(1); }
   }
 
@@ -299,16 +300,49 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
   }
 
   @keyframes fade-in {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Item completing: pop the check, then fade out the row */
+  @keyframes item-fade-out {
+    0% { opacity: 1; max-height: 60px; padding-top: 10px; padding-bottom: 10px; margin-bottom: 0; }
+    50% { opacity: 0; max-height: 60px; padding-top: 10px; padding-bottom: 10px; margin-bottom: 0; }
+    100% { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; margin-bottom: -4px; }
+  }
+
+  .todo-item.completing-item {
+    animation: item-fade-out 0.45s ease-out forwards;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .todo-item.completing-item .todo-checkbox {
+    color: var(--success-color, #4caf50);
+  }
+
+  .todo-item.completing-item .todo-summary {
+    text-decoration: line-through;
+    color: var(--secondary-text-color);
+  }
+
+  /* Sections and content areas entering - only on the list container,
+     not individual items, to avoid re-animating on every state update */
+  .todo-list {
+    animation: fade-in 0.2s ease-out both;
   }
 
   /* ── All Done Celebration ────────────────────────────── */
 
+  @keyframes celebrate-in {
+    from { opacity: 0; transform: scale(0.9) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
   .all-done {
     text-align: center;
     padding: 32px 16px;
-    animation: fade-in 0.3s ease-out;
+    animation: celebrate-in 0.4s ease-out;
   }
 
   .all-done ha-icon {
@@ -330,6 +364,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     text-align: center;
     padding: 32px 16px;
     color: var(--secondary-text-color);
+    animation: fade-in 0.3s ease-out;
   }
 
   .empty-state ha-icon {
@@ -347,14 +382,16 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
   /* ── Reduced Motion ──────────────────────────────────── */
 
   @media (prefers-reduced-motion: reduce) {
-    .todo-checkbox.completing {
-      animation: none;
-    }
-    .all-done {
+    .todo-checkbox.completing,
+    .all-done,
+    .todo-item.completing-item,
+    .todo-list,
+    .empty-state,
+    .chore-list {
       animation: none;
     }
   }
-`;a`
+`;r`
   :host {
     display: block;
   }
@@ -459,7 +496,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
   .switch-row label {
     flex: 1;
   }
-`,a`
+`,r`
   ha-dialog {
     --mdc-dialog-min-width: 400px;
     --mdc-dialog-max-width: 600px;
@@ -471,7 +508,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
       --mdc-dialog-max-width: 100%;
     }
   }
-`;const ge={en:{"card.title":"Chore scheduler","card.empty_title":"No chores configured yet.","card.empty_subtitle":"Click the + button to add your first chore.","editor.add_title":"Add chore","editor.edit_title":"Edit chore","editor.name":"Name","editor.description":"Description (optional)","editor.enabled":"Enabled","editor.save":"Save","editor.add":"Add","editor.cancel":"Cancel","editor.delete":"Delete","editor.delete_confirm":"Are you sure you want to delete this chore?","schedule.title":"Schedule","schedule.frequency":"Frequency","schedule.once":"Once","schedule.daily":"Daily","schedule.weekly":"Weekly","schedule.monthly":"Monthly","schedule.days":"Days","schedule.day_of_month":"Day of month","schedule.time":"Time","weekday.monday":"Mon","weekday.tuesday":"Tue","weekday.wednesday":"Wed","weekday.thursday":"Thu","weekday.friday":"Fri","weekday.saturday":"Sat","weekday.sunday":"Sun","assignment.title":"Assignment","assignment.mode":"Mode","assignment.unassigned":"Unassigned","assignment.fixed":"Fixed","assignment.rotating":"Rotating","assignment.assignees":"Assignees","assignment.add_assignee":"Add assignee","assignment.rotating_current":"Rotating (current: {name})","assignment.assigned_to":"Assigned to: {names}","target.title":"Target","target.todo_list":"Todo list","target.default":"Default","notifications.title":"Notifications","notifications.send":"Send notifications","notifications.targets":"Notify targets","notifications.add_target":"Add target","display.daily_at":"Daily at {time}","display.monthly_at":"Monthly on day {day} at {time}","display.at_time":"At {time}","action.edit_chores":"Edit chores","action.show_chores":"Show chores","action.add":"Add","mode.display":"View","mode.manage":"Manage","display.overdue":"Overdue","display.today":"Today","display.upcoming":"Upcoming","display.done":"Done","display.all_done":"All chores done!","display.no_pending":"No pending chores","display.empty_todos":"No chores scheduled yet.","display.streak":"{count} day streak"},sv:{"card.title":"Sysslor","card.empty_title":"Inga sysslor konfigurerade ännu.","card.empty_subtitle":"Klicka på + för att lägga till din första syssla.","editor.add_title":"Lägg till syssla","editor.edit_title":"Redigera syssla","editor.name":"Namn","editor.description":"Beskrivning (valfritt)","editor.enabled":"Aktiverad","editor.save":"Spara","editor.add":"Lägg till","editor.cancel":"Avbryt","editor.delete":"Ta bort","editor.delete_confirm":"Är du säker på att du vill ta bort denna syssla?","schedule.title":"Schema","schedule.frequency":"Frekvens","schedule.once":"En gång","schedule.daily":"Dagligen","schedule.weekly":"Veckovis","schedule.monthly":"Månadsvis","schedule.days":"Dagar","schedule.day_of_month":"Dag i månaden","schedule.time":"Tid","weekday.monday":"Mån","weekday.tuesday":"Tis","weekday.wednesday":"Ons","weekday.thursday":"Tor","weekday.friday":"Fre","weekday.saturday":"Lör","weekday.sunday":"Sön","assignment.title":"Tilldelning","assignment.mode":"Läge","assignment.unassigned":"Ej tilldelad","assignment.fixed":"Fast","assignment.rotating":"Roterande","assignment.assignees":"Tilldelade","assignment.add_assignee":"Lägg till person","assignment.rotating_current":"Roterande (nuvarande: {name})","assignment.assigned_to":"Tilldelad: {names}","target.title":"Mål","target.todo_list":"Att-göra-lista","target.default":"Standard","notifications.title":"Notifieringar","notifications.send":"Skicka notifieringar","notifications.targets":"Notifieringsmål","notifications.add_target":"Lägg till mål","display.daily_at":"Dagligen kl {time}","display.monthly_at":"Månadsvis dag {day} kl {time}","display.at_time":"Kl {time}","action.edit_chores":"Ändra sysslor","action.show_chores":"Visa sysslor","action.add":"Lägg till","mode.display":"Visa","mode.manage":"Hantera","display.overdue":"Försenade","display.today":"Idag","display.upcoming":"Kommande","display.done":"Klart","display.all_done":"Alla sysslor klara!","display.no_pending":"Inga väntande sysslor","display.empty_todos":"Inga sysslor schemalagda ännu.","display.streak":"{count} dagars svit"}};function ye(e,t,i){let s=(ge[t?.language||"en"]||ge.en)[e]||ge.en[e]||e;return i&&Object.entries(i).forEach(([e,t])=>{s=s.replace(`{${e}}`,String(t))}),s}function fe(e,t){return ye(`weekday.${e}`,t)}const _e=[{keywords:["vacuum","dammsug","dammsu"],icon:"mdi:vacuum"},{keywords:["mop","mopp","skur"],icon:"mdi:creation"},{keywords:["dust","damm","torka av"],icon:"mdi:spray"},{keywords:["clean","städ","rengör","putsa"],icon:"mdi:spray-bottle"},{keywords:["wipe","torka"],icon:"mdi:spray"},{keywords:["scrub","skrubba"],icon:"mdi:brush"},{keywords:["sweep","sopa","broom","kvast"],icon:"mdi:broom"},{keywords:["dish","disk","tallrik"],icon:"mdi:dishwasher"},{keywords:["cook","laga mat","matlagning"],icon:"mdi:pot-steam"},{keywords:["grocer","handla","shop","inköp","inkop","affär"],icon:"mdi:cart"},{keywords:["trash","garbage","sopor","soptunna","avfall","kasta"],icon:"mdi:trash-can"},{keywords:["recycl","återvinn","atervinn","sorter"],icon:"mdi:recycle"},{keywords:["compost","kompost"],icon:"mdi:leaf"},{keywords:["laundry","tvätt","tvatt"],icon:"mdi:washing-machine"},{keywords:["wash","tvätta","tvatta"],icon:"mdi:washing-machine"},{keywords:["iron","stryk","stryka"],icon:"mdi:tshirt-crew"},{keywords:["fold","vik","vika"],icon:"mdi:tshirt-crew"},{keywords:["lawn","gräsmatta","grasmatta","mow","klipp gräs","gräsklipp"],icon:"mdi:mower-bag"},{keywords:["garden","trädgård","tradgard","odla"],icon:"mdi:flower"},{keywords:["plant","växt","vaxt","blomm"],icon:"mdi:flower"},{keywords:["water","vattna"],icon:"mdi:watering-can"},{keywords:["snow","snö","sno","skotta"],icon:"mdi:snowflake"},{keywords:["rake","kratta","löv","lov"],icon:"mdi:leaf"},{keywords:["dog","hund"],icon:"mdi:dog"},{keywords:["cat","katt"],icon:"mdi:cat"},{keywords:["pet","husdjur","djur"],icon:"mdi:paw"},{keywords:["feed","mata","foder"],icon:"mdi:food-drumstick"},{keywords:["walk","promen","rast"],icon:"mdi:walk"},{keywords:["litter","kattlåd","kattlad","kattsan"],icon:"mdi:cat"},{keywords:["bed","säng","sang","bädd"],icon:"mdi:bed"},{keywords:["bathroom","badrum","toalett","toilet","wc"],icon:"mdi:toilet"},{keywords:["shower","dusch"],icon:"mdi:shower"},{keywords:["window","fönster","fonster"],icon:"mdi:window-open"},{keywords:["floor","golv"],icon:"mdi:floor-plan"},{keywords:["mail","post","brev"],icon:"mdi:mailbox"},{keywords:["bill","räkning","rakning","faktur"],icon:"mdi:receipt-text"},{keywords:["pay","betal"],icon:"mdi:credit-card"},{keywords:["medic","medicin","läkemedel"],icon:"mdi:pill"},{keywords:["vitamin"],icon:"mdi:pill"},{keywords:["exercis","workout","träna","trana","motion"],icon:"mdi:dumbbell"}];function ve(e){return e.toLowerCase().replace(/å/g,"a").replace(/ä/g,"a").replace(/ö/g,"o")}function be(e,t){const i=e.indexOf(t);return-1!==i&&(0===i||/[\s\-_,;:(\/]/.test(e[i-1]))}function xe(e){const t=ve(e),i=e.toLowerCase();for(const e of _e)for(const s of e.keywords){const o=ve(s);if(be(t,o))return e.icon;if(s!==o&&be(i,s))return e.icon}return"mdi:checkbox-marked-circle-outline"}const $e=()=>window.matchMedia("(prefers-reduced-motion: reduce)").matches;const we=["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];let ke=class extends ne{constructor(){super(...arguments),this.chore=null,this._name="",this._description="",this._scheduleType="weekly",this._scheduleDays=["sunday"],this._scheduleTime="10:00",this._scheduleDayOfMonth=1,this._scheduleDate="",this._selectedAssignee=null,this._notificationsEnabled=!1,this._notifyTargets=[],this._persistentNotification=!1}firstUpdated(e){super.firstUpdated(e),this._initializeFromChore()}updated(e){super.updated(e),e.has("chore")&&this._initializeFromChore()}_initializeFromChore(){if(this.chore){this._name=this.chore.name,this._description=this.chore.description||"",this._scheduleType=this.chore.schedule.type,this._scheduleDays=this.chore.schedule.days||["sunday"],this._scheduleTime=this.chore.schedule.time||"10:00",this._scheduleDayOfMonth=this.chore.schedule.day_of_month||1,this._scheduleDate=this.chore.schedule.date||this._getTodayDate();const e=this.chore.assignment;"unassigned"!==e.mode&&e.assignees?.length?this._selectedAssignee=e.assignees[0]:this._selectedAssignee=null,this._notificationsEnabled=this.chore.notifications.enabled,this._notifyTargets=[...this.chore.notifications.notify_targets||[]],this._persistentNotification=this._notifyTargets.includes("persistent_notification"),this._notifyTargets=this._notifyTargets.filter(e=>"persistent_notification"!==e)}else this._resetForm()}_resetForm(){this._name="",this._description="",this._scheduleType="weekly",this._scheduleDays=["sunday"],this._scheduleTime="10:00",this._scheduleDayOfMonth=1,this._scheduleDate=this._getTodayDate(),this._selectedAssignee=null,this._notificationsEnabled=!1,this._notifyTargets=[],this._persistentNotification=!1}_getTodayDate(){return(new Date).toISOString().split("T")[0]}render(){const e=!this.chore,t=this._getPersonEntities(),i=this._getMobileDevices();return q`
+`;const ge={en:{"card.title":"Chore scheduler","card.empty_title":"No chores configured yet.","card.empty_subtitle":"Click the + button to add your first chore.","editor.add_title":"Add chore","editor.edit_title":"Edit chore","editor.name":"Name","editor.description":"Description (optional)","editor.enabled":"Enabled","editor.save":"Save","editor.add":"Add","editor.cancel":"Cancel","editor.delete":"Delete","editor.delete_confirm":"Are you sure you want to delete this chore?","schedule.title":"Schedule","schedule.frequency":"Frequency","schedule.once":"Once","schedule.daily":"Daily","schedule.weekly":"Weekly","schedule.monthly":"Monthly","schedule.days":"Days","schedule.day_of_month":"Day of month","schedule.time":"Time","weekday.monday":"Mon","weekday.tuesday":"Tue","weekday.wednesday":"Wed","weekday.thursday":"Thu","weekday.friday":"Fri","weekday.saturday":"Sat","weekday.sunday":"Sun","assignment.title":"Assignment","assignment.mode":"Mode","assignment.unassigned":"Unassigned","assignment.fixed":"Fixed","assignment.rotating":"Rotating","assignment.assignees":"Assignees","assignment.add_assignee":"Add assignee","assignment.rotating_current":"Rotating (current: {name})","assignment.assigned_to":"Assigned to: {names}","target.title":"Target","target.todo_list":"Todo list","target.default":"Default","notifications.title":"Notifications","notifications.send":"Send notifications","notifications.targets":"Notify targets","notifications.add_target":"Add target","display.daily_at":"Daily at {time}","display.monthly_at":"Monthly on day {day} at {time}","display.at_time":"At {time}","action.edit_chores":"Edit chores","action.show_chores":"Show chores","action.add":"Add","mode.display":"View","mode.manage":"Manage","display.overdue":"Overdue","display.today":"Today","display.upcoming":"Upcoming","display.done":"Done","display.all_done":"All chores done!","display.no_pending":"No pending chores","display.empty_todos":"No chores scheduled yet.","display.streak":"{count} day streak"},sv:{"card.title":"Sysslor","card.empty_title":"Inga sysslor konfigurerade ännu.","card.empty_subtitle":"Klicka på + för att lägga till din första syssla.","editor.add_title":"Lägg till syssla","editor.edit_title":"Redigera syssla","editor.name":"Namn","editor.description":"Beskrivning (valfritt)","editor.enabled":"Aktiverad","editor.save":"Spara","editor.add":"Lägg till","editor.cancel":"Avbryt","editor.delete":"Ta bort","editor.delete_confirm":"Är du säker på att du vill ta bort denna syssla?","schedule.title":"Schema","schedule.frequency":"Frekvens","schedule.once":"En gång","schedule.daily":"Dagligen","schedule.weekly":"Veckovis","schedule.monthly":"Månadsvis","schedule.days":"Dagar","schedule.day_of_month":"Dag i månaden","schedule.time":"Tid","weekday.monday":"Mån","weekday.tuesday":"Tis","weekday.wednesday":"Ons","weekday.thursday":"Tor","weekday.friday":"Fre","weekday.saturday":"Lör","weekday.sunday":"Sön","assignment.title":"Tilldelning","assignment.mode":"Läge","assignment.unassigned":"Ej tilldelad","assignment.fixed":"Fast","assignment.rotating":"Roterande","assignment.assignees":"Tilldelade","assignment.add_assignee":"Lägg till person","assignment.rotating_current":"Roterande (nuvarande: {name})","assignment.assigned_to":"Tilldelad: {names}","target.title":"Mål","target.todo_list":"Att-göra-lista","target.default":"Standard","notifications.title":"Notifieringar","notifications.send":"Skicka notifieringar","notifications.targets":"Notifieringsmål","notifications.add_target":"Lägg till mål","display.daily_at":"Dagligen kl {time}","display.monthly_at":"Månadsvis dag {day} kl {time}","display.at_time":"Kl {time}","action.edit_chores":"Ändra sysslor","action.show_chores":"Visa sysslor","action.add":"Lägg till","mode.display":"Visa","mode.manage":"Hantera","display.overdue":"Försenade","display.today":"Idag","display.upcoming":"Kommande","display.done":"Klart","display.all_done":"Alla sysslor klara!","display.no_pending":"Inga väntande sysslor","display.empty_todos":"Inga sysslor schemalagda ännu.","display.streak":"{count} dagars svit"}};function ye(e,t,i){let o=(ge[t?.language||"en"]||ge.en)[e]||ge.en[e]||e;return i&&Object.entries(i).forEach(([e,t])=>{o=o.replace(`{${e}}`,String(t))}),o}function fe(e,t){return ye(`weekday.${e}`,t)}const _e=[{keywords:["vacuum","dammsug","dammsu"],icon:"mdi:vacuum"},{keywords:["mop","mopp","skur"],icon:"mdi:creation"},{keywords:["dust","damm","torka av"],icon:"mdi:spray"},{keywords:["clean","städ","rengör","putsa"],icon:"mdi:spray-bottle"},{keywords:["wipe","torka"],icon:"mdi:spray"},{keywords:["scrub","skrubba"],icon:"mdi:brush"},{keywords:["sweep","sopa","broom","kvast"],icon:"mdi:broom"},{keywords:["dish","disk","tallrik"],icon:"mdi:dishwasher"},{keywords:["cook","laga mat","matlagning"],icon:"mdi:pot-steam"},{keywords:["grocer","handla","shop","inköp","inkop","affär"],icon:"mdi:cart"},{keywords:["trash","garbage","sopor","soptunna","avfall","kasta"],icon:"mdi:trash-can"},{keywords:["recycl","återvinn","atervinn","sorter"],icon:"mdi:recycle"},{keywords:["compost","kompost"],icon:"mdi:leaf"},{keywords:["laundry","tvätt","tvatt"],icon:"mdi:washing-machine"},{keywords:["wash","tvätta","tvatta"],icon:"mdi:washing-machine"},{keywords:["iron","stryk","stryka"],icon:"mdi:tshirt-crew"},{keywords:["fold","vik","vika"],icon:"mdi:tshirt-crew"},{keywords:["lawn","gräsmatta","grasmatta","mow","klipp gräs","gräsklipp"],icon:"mdi:mower-bag"},{keywords:["garden","trädgård","tradgard","odla"],icon:"mdi:flower"},{keywords:["plant","växt","vaxt","blomm"],icon:"mdi:flower"},{keywords:["water","vattna"],icon:"mdi:watering-can"},{keywords:["snow","snö","sno","skotta"],icon:"mdi:snowflake"},{keywords:["rake","kratta","löv","lov"],icon:"mdi:leaf"},{keywords:["dog","hund"],icon:"mdi:dog"},{keywords:["cat","katt"],icon:"mdi:cat"},{keywords:["pet","husdjur","djur"],icon:"mdi:paw"},{keywords:["feed","mata","foder"],icon:"mdi:food-drumstick"},{keywords:["walk","promen","rast"],icon:"mdi:walk"},{keywords:["litter","kattlåd","kattlad","kattsan"],icon:"mdi:cat"},{keywords:["bed","säng","sang","bädd"],icon:"mdi:bed"},{keywords:["bathroom","badrum","toalett","toilet","wc"],icon:"mdi:toilet"},{keywords:["shower","dusch"],icon:"mdi:shower"},{keywords:["window","fönster","fonster"],icon:"mdi:window-open"},{keywords:["floor","golv"],icon:"mdi:floor-plan"},{keywords:["mail","post","brev"],icon:"mdi:mailbox"},{keywords:["bill","räkning","rakning","faktur"],icon:"mdi:receipt-text"},{keywords:["pay","betal"],icon:"mdi:credit-card"},{keywords:["medic","medicin","läkemedel"],icon:"mdi:pill"},{keywords:["vitamin"],icon:"mdi:pill"},{keywords:["exercis","workout","träna","trana","motion"],icon:"mdi:dumbbell"}];function ve(e){return e.toLowerCase().replace(/å/g,"a").replace(/ä/g,"a").replace(/ö/g,"o")}function be(e,t){const i=e.indexOf(t);return-1!==i&&(0===i||/[\s\-_,;:(\/]/.test(e[i-1]))}function xe(e){const t=ve(e),i=e.toLowerCase();for(const e of _e)for(const o of e.keywords){const s=ve(o);if(be(t,s))return e.icon;if(o!==s&&be(i,o))return e.icon}return"mdi:checkbox-marked-circle-outline"}const we=()=>window.matchMedia("(prefers-reduced-motion: reduce)").matches;const $e=["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];let ke=class extends ne{constructor(){super(...arguments),this.chore=null,this._name="",this._description="",this._scheduleType="weekly",this._scheduleDays=["sunday"],this._scheduleTime="10:00",this._scheduleDayOfMonth=1,this._scheduleDate="",this._selectedAssignee=null,this._notificationsEnabled=!1,this._notifyTargets=[],this._persistentNotification=!1,this._closing=!1}firstUpdated(e){super.firstUpdated(e),this._initializeFromChore()}updated(e){super.updated(e),e.has("chore")&&this._initializeFromChore()}_initializeFromChore(){if(this.chore){this._name=this.chore.name,this._description=this.chore.description||"",this._scheduleType=this.chore.schedule.type,this._scheduleDays=this.chore.schedule.days||["sunday"],this._scheduleTime=this.chore.schedule.time||"10:00",this._scheduleDayOfMonth=this.chore.schedule.day_of_month||1,this._scheduleDate=this.chore.schedule.date||this._getTodayDate();const e=this.chore.assignment;"unassigned"!==e.mode&&e.assignees?.length?this._selectedAssignee=e.assignees[0]:this._selectedAssignee=null,this._notificationsEnabled=this.chore.notifications.enabled,this._notifyTargets=[...this.chore.notifications.notify_targets||[]],this._persistentNotification=this._notifyTargets.includes("persistent_notification"),this._notifyTargets=this._notifyTargets.filter(e=>"persistent_notification"!==e)}else this._resetForm()}_resetForm(){this._name="",this._description="",this._scheduleType="weekly",this._scheduleDays=["sunday"],this._scheduleTime="10:00",this._scheduleDayOfMonth=1,this._scheduleDate=this._getTodayDate(),this._selectedAssignee=null,this._notificationsEnabled=!1,this._notifyTargets=[],this._persistentNotification=!1}_getTodayDate(){return(new Date).toISOString().split("T")[0]}render(){const e=!this.chore,t=this._getPersonEntities(),i=this._getMobileDevices();return F`
       <div class="overlay" @click=${this._handleOverlayClick}>
         <div class="dialog" @click=${e=>e.stopPropagation()}>
           <div class="dialog-header">
@@ -581,7 +618,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
                 ></ha-switch>
               </div>
 
-              ${this._notificationsEnabled?q`
+              ${this._notificationsEnabled?F`
                 <div class="notify-options">
                   <div
                     class="notify-option ${this._persistentNotification?"selected":""}"
@@ -598,10 +635,10 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
                     ></ha-checkbox>
                   </div>
 
-                  ${i.length>0?q`
+                  ${i.length>0?F`
                     <div class="notify-targets">
                       <label class="form-label" style="margin-bottom: 6px;">Mobile devices</label>
-                      ${i.map(e=>q`
+                      ${i.map(e=>F`
                         <div
                           class="notify-option ${this._notifyTargets.includes(e.service)?"selected":""}"
                           @click=${()=>this._toggleNotifyTarget(e.service)}
@@ -624,7 +661,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
           </div>
 
           <div class="dialog-actions">
-            ${e?W:q`
+            ${e?W:F`
               <button class="btn btn-danger delete-btn" @click=${this._handleDelete}>
                 ${ye("editor.delete",this.hass)}
               </button>
@@ -642,7 +679,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
           </div>
         </div>
       </div>
-    `}_setScheduleType(e){this._scheduleType=e}_renderScheduleExtra(){return"once"===this._scheduleType?q`
+    `}_setScheduleType(e){this._scheduleType=e}_renderScheduleExtra(){return"once"===this._scheduleType?F`
         <div class="schedule-extra">
           <label class="form-label">On date</label>
           <ha-textfield
@@ -651,11 +688,11 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
             @input=${e=>this._scheduleDate=e.target.value}
           ></ha-textfield>
         </div>
-      `:"weekly"===this._scheduleType?q`
+      `:"weekly"===this._scheduleType?F`
         <div class="schedule-extra">
           <label class="form-label">On days</label>
           <div class="day-grid">
-            ${we.map(e=>q`
+            ${$e.map(e=>F`
               <div
                 class="day-chip ${this._scheduleDays.includes(e)?"selected":""}"
                 @click=${()=>this._toggleDay(e)}
@@ -665,7 +702,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
             `)}
           </div>
         </div>
-      `:"monthly"===this._scheduleType?q`
+      `:"monthly"===this._scheduleType?F`
         <div class="schedule-extra">
           <ha-select
             .value=${String(this._scheduleDayOfMonth)}
@@ -674,22 +711,42 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
             label="On day"
             fixedMenuPosition
           >
-            ${Array.from({length:31},(e,t)=>t+1).map(e=>q`
+            ${Array.from({length:31},(e,t)=>t+1).map(e=>F`
               <ha-list-item .value=${String(e)}>${this._formatOrdinal(e)}</ha-list-item>
             `)}
           </ha-select>
         </div>
-      `:W}_formatOrdinal(e){const t=["th","st","nd","rd"],i=e%100;return e+(t[(i-20)%10]||t[i]||t[0])}_handleDayOfMonthChange(e){e.detail?.value&&(this._scheduleDayOfMonth=parseInt(e.detail.value)||1)}_renderPersonOption(e){const t=e.entity_id,i=(e.attributes.friendly_name||t.split(".")[1].replace(/_/g," ")).split(" ")[0],s=e.attributes.entity_picture,o=this._selectedAssignee===t;return q`
+      `:W}_formatOrdinal(e){const t=["th","st","nd","rd"],i=e%100;return e+(t[(i-20)%10]||t[i]||t[0])}_handleDayOfMonthChange(e){e.detail?.value&&(this._scheduleDayOfMonth=parseInt(e.detail.value)||1)}_renderPersonOption(e){const t=e.entity_id,i=(e.attributes.friendly_name||t.split(".")[1].replace(/_/g," ")).split(" ")[0],o=e.attributes.entity_picture,s=this._selectedAssignee===t;return F`
       <div
-        class="person-option ${o?"selected":""}"
+        class="person-option ${s?"selected":""}"
         @click=${()=>this._selectedAssignee=t}
       >
         <div class="person-avatar">
-          ${s?q`<img src="${s}" alt="${i}" />`:q`<ha-icon icon="mdi:account"></ha-icon>`}
+          ${o?F`<img src="${o}" alt="${i}" />`:F`<ha-icon icon="mdi:account"></ha-icon>`}
         </div>
         <span class="person-name">${i}</span>
       </div>
-    `}_getPersonEntities(){return Object.values(this.hass.states).filter(e=>e.entity_id.startsWith("person."))}_getMobileDevices(){const e=this.hass.services.notify;return e?Object.keys(e).filter(e=>e.startsWith("mobile_app_")).map(e=>({service:`notify.${e}`,name:e.replace("mobile_app_","").replace(/_/g," ")})):[]}_toggleDay(e){this._scheduleDays.includes(e)?this._scheduleDays.length>1&&(this._scheduleDays=[...this._scheduleDays.filter(t=>t!==e)]):this._scheduleDays=[...this._scheduleDays,e]}_toggleNotifyTarget(e){this._notifyTargets.includes(e)?this._notifyTargets=[...this._notifyTargets.filter(t=>t!==e)]:this._notifyTargets=[...this._notifyTargets,e]}_handleOverlayClick(){this._handleCancel()}_handleCancel(){this.dispatchEvent(new CustomEvent("editor-close",{bubbles:!0,composed:!0}))}_handleSave(){const e={type:this._scheduleType,time:this._scheduleTime,interval:1};"once"===this._scheduleType?e.date=this._scheduleDate:"weekly"===this._scheduleType?e.days=this._scheduleDays:"monthly"===this._scheduleType&&(e.day_of_month=this._scheduleDayOfMonth);const t={mode:this._selectedAssignee?"fixed":"unassigned",assignees:this._selectedAssignee?[this._selectedAssignee]:[],current_index:0},i=[...this._notifyTargets];this._persistentNotification&&i.push("persistent_notification");const s={enabled:this._notificationsEnabled,remind_before:60,notify_targets:i},o={name:this._name.trim(),description:this._description.trim(),enabled:!0,schedule:e,assignment:t,notifications:s};this.chore&&(o.id=this.chore.id),this.dispatchEvent(new CustomEvent("chore-save",{detail:{chore:o,isNew:!this.chore},bubbles:!0,composed:!0}))}_handleDelete(){this.chore&&confirm(ye("editor.delete_confirm",this.hass))&&this.dispatchEvent(new CustomEvent("chore-delete",{detail:{choreId:this.chore.id},bubbles:!0,composed:!0}))}};ke.styles=a`
+    `}_getPersonEntities(){return Object.values(this.hass.states).filter(e=>e.entity_id.startsWith("person."))}_getMobileDevices(){const e=this.hass.services.notify;return e?Object.keys(e).filter(e=>e.startsWith("mobile_app_")).map(e=>({service:`notify.${e}`,name:e.replace("mobile_app_","").replace(/_/g," ")})):[]}_toggleDay(e){this._scheduleDays.includes(e)?this._scheduleDays.length>1&&(this._scheduleDays=[...this._scheduleDays.filter(t=>t!==e)]):this._scheduleDays=[...this._scheduleDays,e]}_toggleNotifyTarget(e){this._notifyTargets.includes(e)?this._notifyTargets=[...this._notifyTargets.filter(t=>t!==e)]:this._notifyTargets=[...this._notifyTargets,e]}_handleOverlayClick(){this._animateClose()}_handleCancel(){this._animateClose()}_animateClose(){if(this._closing)return;this._closing=!0;const e=this.shadowRoot?.querySelector(".overlay"),t=()=>{this.dispatchEvent(new CustomEvent("editor-close",{bubbles:!0,composed:!0}))};e&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches?(e.classList.add("closing"),e.addEventListener("animationend",i=>{i.target===e&&t()},{once:!0}),setTimeout(t,300)):t()}_handleSave(){const e={type:this._scheduleType,time:this._scheduleTime,interval:1};"once"===this._scheduleType?e.date=this._scheduleDate:"weekly"===this._scheduleType?e.days=this._scheduleDays:"monthly"===this._scheduleType&&(e.day_of_month=this._scheduleDayOfMonth);const t={mode:this._selectedAssignee?"fixed":"unassigned",assignees:this._selectedAssignee?[this._selectedAssignee]:[],current_index:0},i=[...this._notifyTargets];this._persistentNotification&&i.push("persistent_notification");const o={enabled:this._notificationsEnabled,remind_before:60,notify_targets:i},s={name:this._name.trim(),description:this._description.trim(),enabled:!0,schedule:e,assignment:t,notifications:o};this.chore&&(s.id=this.chore.id),this.dispatchEvent(new CustomEvent("chore-save",{detail:{chore:s,isNew:!this.chore},bubbles:!0,composed:!0}))}_handleDelete(){this.chore&&confirm(ye("editor.delete_confirm",this.hass))&&this.dispatchEvent(new CustomEvent("chore-delete",{detail:{choreId:this.chore.id},bubbles:!0,composed:!0}))}};ke.styles=r`
+    @keyframes overlay-fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes overlay-fade-out {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    @keyframes dialog-enter {
+      from { opacity: 0; transform: translateY(24px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes dialog-exit {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(24px) scale(0.96); }
+    }
+
     .overlay {
       position: fixed;
       inset: 0;
@@ -700,6 +757,11 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
       z-index: 999;
       padding: 12px;
       box-sizing: border-box;
+      animation: overlay-fade-in 0.2s ease-out;
+    }
+
+    .overlay.closing {
+      animation: overlay-fade-out 0.2s ease-in forwards;
     }
 
     .dialog {
@@ -712,6 +774,20 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      animation: dialog-enter 0.25s ease-out;
+    }
+
+    .overlay.closing .dialog {
+      animation: dialog-exit 0.2s ease-in forwards;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .overlay,
+      .overlay.closing,
+      .dialog,
+      .overlay.closing .dialog {
+        animation: none;
+      }
     }
 
     .dialog-header {
@@ -1070,7 +1146,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
       opacity: 0.5;
       cursor: not-allowed;
     }
-  `,e([pe({attribute:!1})],ke.prototype,"hass",void 0),e([pe({attribute:!1})],ke.prototype,"chore",void 0),e([me()],ke.prototype,"_name",void 0),e([me()],ke.prototype,"_description",void 0),e([me()],ke.prototype,"_scheduleType",void 0),e([me()],ke.prototype,"_scheduleDays",void 0),e([me()],ke.prototype,"_scheduleTime",void 0),e([me()],ke.prototype,"_scheduleDayOfMonth",void 0),e([me()],ke.prototype,"_scheduleDate",void 0),e([me()],ke.prototype,"_selectedAssignee",void 0),e([me()],ke.prototype,"_notificationsEnabled",void 0),e([me()],ke.prototype,"_notifyTargets",void 0),e([me()],ke.prototype,"_persistentNotification",void 0),ke=e([ce("chore-editor")],ke);let Ae=class extends ne{setConfig(e){this._config=e}render(){return this.hass&&this._config?q`
+  `,e([pe({attribute:!1})],ke.prototype,"hass",void 0),e([pe({attribute:!1})],ke.prototype,"chore",void 0),e([me()],ke.prototype,"_name",void 0),e([me()],ke.prototype,"_description",void 0),e([me()],ke.prototype,"_scheduleType",void 0),e([me()],ke.prototype,"_scheduleDays",void 0),e([me()],ke.prototype,"_scheduleTime",void 0),e([me()],ke.prototype,"_scheduleDayOfMonth",void 0),e([me()],ke.prototype,"_scheduleDate",void 0),e([me()],ke.prototype,"_selectedAssignee",void 0),e([me()],ke.prototype,"_notificationsEnabled",void 0),e([me()],ke.prototype,"_notifyTargets",void 0),e([me()],ke.prototype,"_persistentNotification",void 0),ke=e([ce("chore-editor")],ke);let Ae=class extends ne{setConfig(e){this._config=e}render(){return this.hass&&this._config?F`
       <div class="form-group">
         <ha-textfield
           label="Title"
@@ -1116,7 +1192,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
           ></ha-switch>
         </div>
       </div>
-    `:q``}_titleChanged(e){const t=e.target;this._updateConfig({title:t.value})}_defaultModeChanged(e){const t=e.detail.value;t&&this._updateConfig({default_mode:t})}_showDisabledChanged(e){const t=e.target;this._updateConfig({show_disabled:t.checked})}_showCompletedChanged(e){const t=e.target;this._updateConfig({show_completed:t.checked})}_enableAnimationsChanged(e){const t=e.target;this._updateConfig({enable_animations:t.checked})}_updateConfig(e){this._config={...this._config,...e},this._fireConfigChanged()}_fireConfigChanged(){this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:this._config},bubbles:!0,composed:!0}))}};Ae.styles=a`
+    `:F``}_titleChanged(e){const t=e.target;this._updateConfig({title:t.value})}_defaultModeChanged(e){const t=e.detail.value;t&&this._updateConfig({default_mode:t})}_showDisabledChanged(e){const t=e.target;this._updateConfig({show_disabled:t.checked})}_showCompletedChanged(e){const t=e.target;this._updateConfig({show_completed:t.checked})}_enableAnimationsChanged(e){const t=e.target;this._updateConfig({enable_animations:t.checked})}_updateConfig(e){this._config={...this._config,...e},this._fireConfigChanged()}_fireConfigChanged(){this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:this._config},bubbles:!0,composed:!0}))}};Ae.styles=r`
     .form-group {
       margin-bottom: 16px;
     }
@@ -1143,12 +1219,12 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
       font-size: 1rem;
       color: var(--primary-text-color);
     }
-  `,e([pe({attribute:!1})],Ae.prototype,"hass",void 0),e([me()],Ae.prototype,"_config",void 0),Ae=e([ce("chore-scheduler-card-editor")],Ae);const Se="chore_scheduler";let Ce=class extends ne{constructor(){super(...arguments),this._chores=[],this._todoItems=[],this._loading=!0,this._editingChore=null,this._showEditor=!1,this._mode="display"}setConfig(e){this._config={...e,title:e.title??"Chore Scheduler",show_disabled:e.show_disabled??!0,show_next_due:e.show_next_due??!0,default_mode:e.default_mode??"display",show_completed:e.show_completed??!1,enable_animations:e.enable_animations??!0},this._mode=this._config.default_mode||"display"}getCardSize(){return Math.max(3,("display"===this._mode?this._todoItems.length:this._chores.length)+1)}firstUpdated(e){super.firstUpdated(e),this._loadData()}updated(e){if(super.updated(e),e.has("hass")&&this.hass){e.get("hass")||this._loadData()}}async _loadData(){if(this.hass){this._loading=!0;try{const[e,t]=await Promise.all([this.hass.connection.sendMessagePromise({type:"chore_scheduler/list"}),this.hass.connection.sendMessagePromise({type:"chore_scheduler/todos"})]);this._chores=e?.chores??[],this._todoItems=t?.items??[]}catch(e){console.warn("[ChoreScheduler] Failed to load data:",e),this._chores=[],this._todoItems=[]}finally{this._loading=!1}}}render(){return this._config?q`
+  `,e([pe({attribute:!1})],Ae.prototype,"hass",void 0),e([me()],Ae.prototype,"_config",void 0),Ae=e([ce("chore-scheduler-card-editor")],Ae);const Se="chore_scheduler";let Ce=class extends ne{constructor(){super(...arguments),this._chores=[],this._todoItems=[],this._loading=!0,this._editingChore=null,this._showEditor=!1,this._mode="display"}setConfig(e){this._config={...e,title:e.title??"Chore Scheduler",show_disabled:e.show_disabled??!0,show_next_due:e.show_next_due??!0,default_mode:e.default_mode??"display",show_completed:e.show_completed??!1,enable_animations:e.enable_animations??!0},this._mode=this._config.default_mode||"display"}getCardSize(){return Math.max(3,("display"===this._mode?this._todoItems.length:this._chores.length)+1)}firstUpdated(e){super.firstUpdated(e),this._loadData()}updated(e){if(super.updated(e),e.has("hass")&&this.hass){e.get("hass")||this._loadData()}}async _loadData(){if(this.hass){this._loading=!0;try{const[e,t]=await Promise.all([this.hass.connection.sendMessagePromise({type:"chore_scheduler/list"}),this.hass.connection.sendMessagePromise({type:"chore_scheduler/todos"})]);this._chores=e?.chores??[],this._todoItems=t?.items??[]}catch(e){console.warn("[ChoreScheduler] Failed to load data:",e),this._chores=[],this._todoItems=[]}finally{this._loading=!1}}}render(){return this._config?F`
       <ha-card>
         <div class="card-header">
           <h1>${this._config.title}</h1>
           <div class="header-actions">
-            ${"manage"===this._mode?q`
+            ${"manage"===this._mode?F`
                   <button class="header-btn" @click=${this._addChore}>
                     <ha-icon icon="mdi:plus"></ha-icon>
                     ${ye("action.add",this.hass)}
@@ -1161,14 +1237,14 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
           </div>
         </div>
 
-        ${this._loading?q`
+        ${this._loading?F`
               <div class="loading">
                 <ha-circular-progress indeterminate></ha-circular-progress>
               </div>
             `:"display"===this._mode?this._renderDisplayMode():this._renderManageMode()}
       </ha-card>
 
-      ${this._showEditor?q`
+      ${this._showEditor?F`
             <chore-editor
               .hass=${this.hass}
               .chore=${this._editingChore}
@@ -1177,63 +1253,63 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
               @editor-close=${this._closeEditor}
             ></chore-editor>
           `:W}
-    `:W}_renderDisplayMode(){const e=this._todoItems.filter(e=>"needs_action"===e.status),t=this._todoItems.filter(e=>"completed"===e.status);if(0===e.length&&0===t.length)return q`
+    `:W}_renderDisplayMode(){const e=this._todoItems.filter(e=>"needs_action"===e.status),t=this._todoItems.filter(e=>"completed"===e.status).sort((e,t)=>(t.completed_at??"").localeCompare(e.completed_at??"")).slice(0,3);if(0===e.length&&0===t.length)return F`
         <div class="empty-state">
           <ha-icon icon="mdi:check-circle-outline"></ha-icon>
           <p>${ye("display.empty_todos",this.hass)}</p>
         </div>
-      `;const i=(new Date).toISOString().split("T")[0],s=e.filter(e=>e.due&&e.due<i),o=e.filter(e=>!e.due||e.due===i),r=e.filter(e=>e.due&&e.due>i);return 0===e.length&&t.length>0?q`
+      `;const i=(new Date).toISOString().split("T")[0],o=e.filter(e=>e.due&&e.due<i),s=e.filter(e=>!e.due||e.due===i),a=e.filter(e=>e.due&&e.due>i);return 0===e.length&&t.length>0?F`
         <div class="all-done">
           <ha-icon icon="mdi:check-circle"></ha-icon>
           <p>${ye("display.all_done",this.hass)}</p>
         </div>
         ${this._config?.show_completed?this._renderSection(ye("display.done",this.hass),t,"completed"):W}
-      `:q`
-      ${s.length?this._renderSection(ye("display.overdue",this.hass),s,"overdue"):W}
-      ${o.length?this._renderSection(ye("display.today",this.hass),o,"today"):W}
-      ${r.length?this._renderSection(ye("display.upcoming",this.hass),r,"upcoming"):W}
+      `:F`
+      ${o.length?this._renderSection(ye("display.overdue",this.hass),o,"overdue"):W}
+      ${s.length?this._renderSection(ye("display.today",this.hass),s,"today"):W}
+      ${a.length?this._renderSection(ye("display.upcoming",this.hass),a,"upcoming"):W}
       ${this._config?.show_completed&&t.length?this._renderSection(ye("display.done",this.hass),t,"completed"):W}
-    `}_renderSection(e,t,i){return q`
+    `}_renderSection(e,t,i){return F`
       <div class="todo-section ${i}">
         <div class="section-header">${e}</div>
         <div class="todo-list">
           ${t.map(e=>this._renderTodoItem(e,i))}
         </div>
       </div>
-    `}_renderTodoItem(e,t){const i=this._chores.find(t=>t.id===e.chore_id),s=xe(i?i.name:e.summary),o="completed"===e.status,r=this._extractAssignee(e.summary),a=e.completion_stats;return q`
+    `}_renderTodoItem(e,t){const i=this._chores.find(t=>t.id===e.chore_id),o=xe(i?i.name:e.summary),s="completed"===e.status,a=this._extractAssignee(e.summary),r=e.completion_stats;return F`
       <div
-        class="todo-item ${o?"completed":""} ${t}"
+        class="todo-item ${s?"completed":""} ${t}"
         id="todo-${e.uid}"
       >
         <ha-icon
           class="todo-checkbox"
-          icon=${o?"mdi:checkbox-marked-circle":"mdi:checkbox-blank-circle-outline"}
-          @click=${()=>!o&&this._handleComplete(e)}
+          icon=${s?"mdi:checkbox-marked-circle":"mdi:checkbox-blank-circle-outline"}
+          @click=${()=>!s&&this._handleComplete(e)}
         ></ha-icon>
-        <ha-icon class="todo-icon" icon=${s}></ha-icon>
+        <ha-icon class="todo-icon" icon=${o}></ha-icon>
         <div class="todo-info">
           <span class="todo-summary">${e.summary}</span>
         </div>
-        ${a&&a.streak>1?q`<span class="streak-badge" title=${ye("display.streak",this.hass,{count:a.streak})}>
-              <ha-icon icon="mdi:fire"></ha-icon>${a.streak}
+        ${r&&r.streak>1?F`<span class="streak-badge" title=${ye("display.streak",this.hass,{count:r.streak})}>
+              <ha-icon icon="mdi:fire"></ha-icon>${r.streak}
             </span>`:W}
-        ${r?this._renderAvatar(r):W}
+        ${a?this._renderAvatar(a):W}
       </div>
-    `}_extractAssignee(e){const t=e.match(/\(([^)]+)\)$/);return t?t[1]:null}_renderAvatar(e){const t=`person.${e.toLowerCase().replace(/\s+/g,"_")}`,i=this.hass?.states[t],s=i?.attributes?.entity_picture,o=e.charAt(0).toUpperCase();return q`
+    `}_extractAssignee(e){const t=e.match(/\(([^)]+)\)$/);return t?t[1]:null}_renderAvatar(e){const t=`person.${e.toLowerCase().replace(/\s+/g,"_")}`,i=this.hass?.states[t],o=i?.attributes?.entity_picture,s=e.charAt(0).toUpperCase();return F`
       <div class="assignee-avatar" title=${e}>
-        ${s?q`<img src=${s} alt=${e} />`:q`<span>${o}</span>`}
+        ${o?F`<img src=${o} alt=${e} />`:F`<span>${s}</span>`}
       </div>
-    `}async _handleComplete(e){if(this._todoItems=this._todoItems.map(t=>t.uid===e.uid?{...t,status:"completed",completed_at:(new Date).toISOString()}:t),!1!==this._config?.enable_animations){const i=this.shadowRoot?.querySelector(`#todo-${e.uid} .todo-checkbox`);i&&(t=i,$e()||(t.classList.add("completing"),t.addEventListener("animationend",()=>t.classList.remove("completing"),{once:!0}))),$e()||"vibrate"in navigator&&navigator.vibrate([50,30,80])}var t;try{await this.hass.connection.sendMessagePromise({type:"chore_scheduler/complete_todo",uid:e.uid})}catch(e){return console.error("[ChoreScheduler] Failed to complete todo:",e),void await this._loadData()}setTimeout(()=>this._loadData(),500)}_renderManageMode(){const e=this._config?.show_disabled?this._chores:this._chores.filter(e=>e.enabled);return 0===e.length?q`
+    `}async _handleComplete(e){const t=!1!==this._config?.enable_animations,i=this.shadowRoot?.querySelector(`#todo-${e.uid}`),o=i?.querySelector(".todo-checkbox");var s;t&&o&&(s=o,we()||(s.classList.add("completing"),s.addEventListener("animationend",()=>s.classList.remove("completing"),{once:!0})),we()||"vibrate"in navigator&&navigator.vibrate([50,30,80]));const a=this.hass.connection.sendMessagePromise({type:"chore_scheduler/complete_todo",uid:e.uid}).catch(e=>(console.error("[ChoreScheduler] Failed to complete todo:",e),"error"));t&&i&&await new Promise(e=>{setTimeout(()=>{i.classList.add("completing-item"),i.addEventListener("animationend",()=>e(),{once:!0}),setTimeout(e,500)},280)});"error"!==await a?(this._todoItems=this._todoItems.map(t=>t.uid===e.uid?{...t,status:"completed",completed_at:(new Date).toISOString()}:t),setTimeout(()=>this._loadData(),300)):await this._loadData()}_renderManageMode(){const e=this._config?.show_disabled?this._chores:this._chores.filter(e=>e.enabled);return 0===e.length?F`
         <div class="empty-state">
           <ha-icon icon="mdi:broom"></ha-icon>
           <p>${ye("card.empty_title",this.hass)}</p>
           <p>${ye("card.empty_subtitle",this.hass)}</p>
         </div>
-      `:q`
+      `:F`
       <div class="chore-list">
         ${e.map(e=>this._renderChoreItem(e))}
       </div>
-    `}_renderChoreItem(e){const t=this._formatSchedule(e.schedule),i=xe(e.name),s=this._getAssigneeNames(e),o=this._getChoreStats(e.id);return q`
+    `}_renderChoreItem(e){const t=this._formatSchedule(e.schedule),i=xe(e.name),o=this._getAssigneeNames(e),s=this._getChoreStats(e.id);return F`
       <div
         class="chore-item ${e.enabled?"":"disabled"}"
         @click=${()=>this._editChore(e)}
@@ -1243,9 +1319,9 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
           <div class="chore-name">${e.name}</div>
           <div class="chore-meta">
             <span class="schedule-pill ${e.schedule.type}">${t}</span>
-            ${s.length?s.map(e=>q`${this._renderAvatar(e)}`):W}
-            ${o&&o.streak>1?q`<span class="streak-badge">
-                  <ha-icon icon="mdi:fire"></ha-icon>${o.streak}
+            ${o.length?o.map(e=>F`${this._renderAvatar(e)}`):W}
+            ${s&&s.streak>1?F`<span class="streak-badge">
+                  <ha-icon icon="mdi:fire"></ha-icon>${s.streak}
                 </span>`:W}
           </div>
         </div>
