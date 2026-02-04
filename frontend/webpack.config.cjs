@@ -4,6 +4,15 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 module.exports = (env, argv) => {
   const isProd = argv.mode === 'production'
 
+  const babelOptions = {
+    presets: [
+      ['@babel/preset-env', {
+        targets: 'chrome >= 55',
+        modules: false,
+      }]
+    ],
+  }
+
   return {
     entry: './src/index.tsx',
     mode: isProd ? 'production' : 'development',
@@ -22,12 +31,21 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
+          // TypeScript files: ts-loader → babel-loader (chained, right to left)
           test: /\.tsx?$/,
-          use: {
-            loader: 'ts-loader',
-            options: { transpileOnly: true },
-          },
           exclude: /node_modules/,
+          use: [
+            { loader: 'babel-loader', options: babelOptions },
+            { loader: 'ts-loader', options: { transpileOnly: true } },
+          ],
+        },
+        {
+          // JS files from node_modules: babel-loader only
+          test: /\.m?js$/,
+          include: /node_modules/,
+          use: [
+            { loader: 'babel-loader', options: babelOptions },
+          ],
         },
       ],
     },

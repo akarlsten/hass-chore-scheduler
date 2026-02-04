@@ -25,6 +25,10 @@ echo "   Copying custom_components/chore_scheduler to ${HA_HOST}:${HA_CONFIG}/cu
 
 scp -P ${HA_PORT} -r custom_components/chore_scheduler ${HA_HOST}:${HA_CONFIG}/custom_components/
 
+# Also copy to www folder for cast compatibility
+echo "   Copying JS to www folder for cast support..."
+ssh -p ${HA_PORT} ${HA_HOST} "mkdir -p ${HA_CONFIG}/www && cp ${HA_CONFIG}/custom_components/chore_scheduler/www/chore-scheduler-card.js ${HA_CONFIG}/www/"
+
 # Restart HA core
 echo "4. Restarting Home Assistant..."
 ssh -p ${HA_PORT} ${HA_HOST} "ha core restart"

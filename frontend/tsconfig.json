@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "outDir": "./dist/",
-    "target": "ES2021",
+    "target": "ES2017",
     "module": "es6",
-    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "lib": ["ES2017", "DOM", "DOM.Iterable"],
     "strict": true,
     "noImplicitAny": true,
     "moduleResolution": "node",

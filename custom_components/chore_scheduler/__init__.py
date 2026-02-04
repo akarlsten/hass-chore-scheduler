@@ -74,7 +74,8 @@ TRIGGER_CHORE_SCHEMA = vol.Schema(
 )
 
 
-FRONTEND_SCRIPT_URL = f"/{DOMAIN}/chore-scheduler-card.js"
+FRONTEND_SCRIPT_PATH = f"/{DOMAIN}/chore-scheduler-card.js"
+FRONTEND_SCRIPT_URL = f"{FRONTEND_SCRIPT_PATH}?v=5"
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -262,10 +263,10 @@ async def _async_register_frontend(hass: HomeAssistant) -> None:
     frontend_path = Path(__file__).parent / "www" / "chore-scheduler-card.js"
 
     if frontend_path.exists():
-        # Register static paths (card JS)
+        # Register static paths (card JS) - use path without query string
         static_paths = [
             StaticPathConfig(
-                FRONTEND_SCRIPT_URL,
+                FRONTEND_SCRIPT_PATH,
                 str(frontend_path),
                 cache_headers=False,
             ),

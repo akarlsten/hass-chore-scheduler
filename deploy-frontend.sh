@@ -23,6 +23,10 @@ cp frontend/dist/chore-scheduler-card.js custom_components/chore_scheduler/www/
 echo "3. Deploying JS to Home Assistant..."
 scp -P ${HA_PORT} custom_components/chore_scheduler/www/chore-scheduler-card.js ${HA_HOST}:${HA_CONFIG}/custom_components/chore_scheduler/www/
 
+# Also copy to www folder for cast compatibility
+echo "4. Copying JS to www folder for cast support..."
+ssh -p ${HA_PORT} ${HA_HOST} "mkdir -p ${HA_CONFIG}/www && cp ${HA_CONFIG}/custom_components/chore_scheduler/www/chore-scheduler-card.js ${HA_CONFIG}/www/"
+
 echo ""
 echo "=== Done ==="
 echo ""
