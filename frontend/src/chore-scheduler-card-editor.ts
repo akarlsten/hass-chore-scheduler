@@ -31,7 +31,7 @@ export class ChoreSchedulerCardEditor extends LitElement {
     }
 
     .switch-label {
-      font-size: 0.875rem;
+      font-size: 1rem;
       color: var(--primary-text-color);
     }
   `;

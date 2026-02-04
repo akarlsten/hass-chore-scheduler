@@ -11,7 +11,7 @@ from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, ServiceCall, callback
+from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
 
 from .const import (
@@ -99,7 +99,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     }
 
     # Register services
-    await _async_register_services(hass, store, coordinator)
+    await _async_register_services(hass)
 
     # Register WebSocket API
     async_register_websocket_api(hass)
@@ -107,7 +107,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Set up platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    # Reload on options change
+    entry.async_on_unload(entry.add_update_listener(_async_update_options))
+
     return True
+
+
+async def _async_update_options(
+    hass: HomeAssistant, entry: ConfigEntry
+) -> None:
+    """Handle options update."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -120,15 +130,25 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return unload_ok
 
 
-async def _async_register_services(
-    hass: HomeAssistant,
-    store: ChoreStore,
-    coordinator: ChoreSchedulerCoordinator,
-) -> None:
+def _get_entry_data(hass: HomeAssistant) -> dict[str, Any] | None:
+    """Get the current store and coordinator from hass.data."""
+    for entry_data in hass.data.get(DOMAIN, {}).values():
+        if isinstance(entry_data, dict) and "store" in entry_data:
+            return entry_data
+    return None
+
+
+async def _async_register_services(hass: HomeAssistant) -> None:
     """Register integration services."""
 
     async def handle_add_chore(call: ServiceCall) -> None:
         """Handle the add_chore service call."""
+        entry_data = _get_entry_data(hass)
+        if not entry_data:
+            _LOGGER.error("Chore Scheduler not loaded")
+            return
+        store = entry_data["store"]
+        coordinator = entry_data["coordinator"]
         chore = await store.async_add_chore(
             name=call.data[ATTR_NAME],
             description=call.data.get(ATTR_DESCRIPTION, ""),
@@ -142,6 +162,12 @@ async def _async_register_services(
 
     async def handle_update_chore(call: ServiceCall) -> None:
         """Handle the update_chore service call."""
+        entry_data = _get_entry_data(hass)
+        if not entry_data:
+            _LOGGER.error("Chore Scheduler not loaded")
+            return
+        store = entry_data["store"]
+        coordinator = entry_data["coordinator"]
         chore_id = call.data[ATTR_CHORE_ID]
         update_data = {
             k: v
@@ -157,6 +183,12 @@ async def _async_register_services(
 
     async def handle_delete_chore(call: ServiceCall) -> None:
         """Handle the delete_chore service call."""
+        entry_data = _get_entry_data(hass)
+        if not entry_data:
+            _LOGGER.error("Chore Scheduler not loaded")
+            return
+        store = entry_data["store"]
+        coordinator = entry_data["coordinator"]
         chore_id = call.data[ATTR_CHORE_ID]
         if await store.async_delete_chore(chore_id):
             _LOGGER.info("Deleted chore: %s", chore_id)
@@ -166,6 +198,12 @@ async def _async_register_services(
 
     async def handle_trigger_chore(call: ServiceCall) -> None:
         """Handle the trigger_chore service call."""
+        entry_data = _get_entry_data(hass)
+        if not entry_data:
+            _LOGGER.error("Chore Scheduler not loaded")
+            return
+        store = entry_data["store"]
+        coordinator = entry_data["coordinator"]
         chore_id = call.data[ATTR_CHORE_ID]
         chore = store.get_chore(chore_id)
         if chore:
@@ -176,6 +214,10 @@ async def _async_register_services(
 
     async def handle_list_chores(call: ServiceCall) -> dict[str, Any]:
         """Handle the list_chores service call."""
+        entry_data = _get_entry_data(hass)
+        if not entry_data:
+            return {"chores": []}
+        store = entry_data["store"]
         return {"chores": store.get_chores()}
 
     # Register services if not already registered
@@ -220,16 +262,27 @@ async def _async_register_frontend(hass: HomeAssistant) -> None:
     frontend_path = Path(__file__).parent / "www" / "chore-scheduler-card.js"
 
     if frontend_path.exists():
-        # Register the static path
-        await hass.http.async_register_static_paths(
-            [
+        # Register static paths (card JS + chime audio)
+        static_paths = [
+            StaticPathConfig(
+                FRONTEND_SCRIPT_URL,
+                str(frontend_path),
+                cache_headers=False,
+            ),
+        ]
+
+        # Register chime audio if it exists
+        chime_path = Path(__file__).parent / "www" / "chime.wav"
+        if chime_path.exists():
+            static_paths.append(
                 StaticPathConfig(
-                    FRONTEND_SCRIPT_URL,
-                    str(frontend_path),
-                    cache_headers=False,
+                    f"/{DOMAIN}/chime.wav",
+                    str(chime_path),
+                    cache_headers=True,
                 )
-            ]
-        )
+            )
+
+        await hass.http.async_register_static_paths(static_paths)
 
         # Add the JS to the frontend
         add_extra_js_url(hass, FRONTEND_SCRIPT_URL)

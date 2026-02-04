@@ -16,7 +16,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
 
   .card-header h1 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.625rem;
     font-weight: 500;
     color: var(--primary-text-color);
   }
@@ -36,7 +36,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     border-radius: 18px;
     background: transparent;
     color: var(--primary-text-color);
-    font-size: 0.8rem;
+    font-size: 0.925rem;
     font-family: inherit;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
@@ -129,7 +129,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     align-items: center;
     padding: 2px 8px;
     border-radius: 12px;
-    font-size: 0.7rem;
+    font-size: 0.825rem;
     font-weight: 500;
     white-space: nowrap;
   }
@@ -166,7 +166,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.65rem;
+    font-size: 0.775rem;
     font-weight: 600;
     color: var(--primary-text-color);
   }
@@ -183,7 +183,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     display: inline-flex;
     align-items: center;
     gap: 2px;
-    font-size: 0.7rem;
+    font-size: 0.825rem;
     font-weight: 600;
     color: var(--warning-color, #ff9800);
     white-space: nowrap;
@@ -204,7 +204,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
   }
 
   .section-header {
-    font-size: 0.7rem;
+    font-size: 0.825rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -272,7 +272,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
   }
 
   .todo-summary {
-    font-size: 0.9rem;
+    font-size: 1.025rem;
     color: var(--primary-text-color);
     white-space: nowrap;
     overflow: hidden;
@@ -318,7 +318,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
   }
 
   .all-done p {
-    font-size: 1.1rem;
+    font-size: 1.225rem;
     font-weight: 500;
     color: var(--primary-text-color);
     margin: 0;
@@ -400,7 +400,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     border: 1px solid var(--divider-color);
     background: var(--card-background-color);
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: 1rem;
     transition: all 0.2s;
   }
 
@@ -721,7 +721,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
 
     .dialog-header h2 {
       margin: 0;
-      font-size: 1.125rem;
+      font-size: 1.25rem;
       font-weight: 500;
       color: var(--primary-text-color);
     }
@@ -742,7 +742,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
 
     .form-label {
       display: block;
-      font-size: 0.7rem;
+      font-size: 0.825rem;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -817,7 +817,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     }
 
     .person-name {
-      font-size: 0.65rem;
+      font-size: 0.775rem;
       color: var(--primary-text-color);
       text-align: center;
       width: 100%;
@@ -873,7 +873,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     }
 
     .schedule-type-chip span {
-      font-size: 0.75rem;
+      font-size: 0.875rem;
       font-weight: 500;
       color: var(--primary-text-color);
     }
@@ -908,7 +908,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.7rem;
+      font-size: 0.825rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.15s ease;
@@ -957,13 +957,13 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     }
 
     .optional-title {
-      font-size: 0.8rem;
+      font-size: 0.925rem;
       font-weight: 500;
       color: var(--primary-text-color);
     }
 
     .optional-desc {
-      font-size: 0.7rem;
+      font-size: 0.825rem;
       color: var(--secondary-text-color);
       margin-top: 2px;
     }
@@ -999,12 +999,12 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     }
 
     .notify-option-title {
-      font-size: 0.8rem;
+      font-size: 0.925rem;
       color: var(--primary-text-color);
     }
 
     .notify-option-desc {
-      font-size: 0.7rem;
+      font-size: 0.825rem;
       color: var(--secondary-text-color);
     }
 
@@ -1032,7 +1032,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     .btn {
       padding: 8px 16px;
       border-radius: 8px;
-      font-size: 0.875rem;
+      font-size: 1rem;
       font-weight: 500;
       cursor: pointer;
       border: none;
@@ -1140,7 +1140,7 @@ function e(e,t,i,s){var o,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
     }
 
     .switch-label {
-      font-size: 0.875rem;
+      font-size: 1rem;
       color: var(--primary-text-color);
     }
   `,e([pe({attribute:!1})],Ae.prototype,"hass",void 0),e([me()],Ae.prototype,"_config",void 0),Ae=e([ce("chore-scheduler-card-editor")],Ae);const Se="chore_scheduler";let Ce=class extends ne{constructor(){super(...arguments),this._chores=[],this._todoItems=[],this._loading=!0,this._editingChore=null,this._showEditor=!1,this._mode="display"}setConfig(e){this._config={...e,title:e.title??"Chore Scheduler",show_disabled:e.show_disabled??!0,show_next_due:e.show_next_due??!0,default_mode:e.default_mode??"display",show_completed:e.show_completed??!1,enable_animations:e.enable_animations??!0},this._mode=this._config.default_mode||"display"}getCardSize(){return Math.max(3,("display"===this._mode?this._todoItems.length:this._chores.length)+1)}firstUpdated(e){super.firstUpdated(e),this._loadData()}updated(e){if(super.updated(e),e.has("hass")&&this.hass){e.get("hass")||this._loadData()}}async _loadData(){if(this.hass){this._loading=!0;try{const[e,t]=await Promise.all([this.hass.connection.sendMessagePromise({type:"chore_scheduler/list"}),this.hass.connection.sendMessagePromise({type:"chore_scheduler/todos"})]);this._chores=e?.chores??[],this._todoItems=t?.items??[]}catch(e){console.warn("[ChoreScheduler] Failed to load data:",e),this._chores=[],this._todoItems=[]}finally{this._loading=!1}}}render(){return this._config?q`

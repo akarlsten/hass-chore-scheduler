@@ -1,6 +1,7 @@
 """Coordinator for the Chore Scheduler integration."""
 from __future__ import annotations
 
+import asyncio
 import calendar
 from datetime import datetime, timedelta
 import logging
@@ -17,8 +18,20 @@ from .const import (
     SCHEDULE_DAILY,
     SCHEDULE_WEEKLY,
     SCHEDULE_MONTHLY,
+    CONF_TTS_ENABLED,
+    CONF_TTS_TARGETS,
+    CONF_TTS_SERVICE,
+    CONF_QUIET_HOURS_START,
+    CONF_QUIET_HOURS_END,
+    CONF_REMINDER_DELAY_HOURS,
+    CONF_CHIME_ENABLED,
+    DEFAULT_QUIET_HOURS_START,
+    DEFAULT_QUIET_HOURS_END,
+    DEFAULT_REMINDER_DELAY_HOURS,
+    DEFAULT_TTS_SERVICE,
 )
 from .store import ChoreStore
+from .tts_messages import get_tts_message
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -82,6 +95,9 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 _LOGGER.exception(
                     "Error processing chore '%s'", chore.get("name", "?")
                 )
+
+        # Check for overdue todo items needing TTS reminders
+        await self._check_reminders()
 
         return {
             "chores": chores,
@@ -293,6 +309,9 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         # Send notification (independent of todo creation)
         await self._send_notification(chore, assignee)
 
+        # Send TTS announcement
+        await self._send_tts_for_chore(chore, assignee, is_reminder=False)
+
         # Create todo item in our own todo list (dedup check)
         if not self.store.todo_item_exists_for_chore(chore["id"]):
             await self.store.async_add_todo_item(
@@ -431,3 +450,211 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 err,
                 exc_info=True,
             )
+
+    # ── TTS Methods ─────────────────────────────────────────────────
+
+    def _get_first_name(self, assignee_entity_id: str) -> str:
+        """Get the first name from a person entity's friendly_name."""
+        state = self.hass.states.get(assignee_entity_id)
+        if state and state.attributes.get("friendly_name"):
+            return state.attributes["friendly_name"].split()[0]
+        # Fallback to entity_id parsing
+        return (
+            assignee_entity_id.split(".")[-1]
+            .replace("_", " ")
+            .title()
+            .split()[0]
+        )
+
+    def _is_quiet_hours(self) -> bool:
+        """Check if current time is within quiet hours."""
+        now = dt_util.now()
+        options = self.entry.options
+
+        start_str = options.get(CONF_QUIET_HOURS_START, DEFAULT_QUIET_HOURS_START)
+        end_str = options.get(CONF_QUIET_HOURS_END, DEFAULT_QUIET_HOURS_END)
+
+        try:
+            start_parts = str(start_str).split(":")
+            end_parts = str(end_str).split(":")
+            start_minutes = int(start_parts[0]) * 60 + int(start_parts[1])
+            end_minutes = int(end_parts[0]) * 60 + int(end_parts[1])
+        except (ValueError, IndexError):
+            # Fallback to defaults
+            start_minutes = 21 * 60  # 21:00
+            end_minutes = 9 * 60  # 09:00
+
+        current_minutes = now.hour * 60 + now.minute
+
+        if start_minutes > end_minutes:
+            # Spans midnight (e.g., 21:00 to 09:00)
+            return current_minutes >= start_minutes or current_minutes < end_minutes
+        else:
+            # Same day (e.g., 22:00 to 23:00)
+            return start_minutes <= current_minutes < end_minutes
+
+    def _get_tts_targets(self) -> list[str]:
+        """Get the configured TTS media_player targets."""
+        options = self.entry.options
+        if not options.get(CONF_TTS_ENABLED, False):
+            return []
+        return options.get(CONF_TTS_TARGETS, [])
+
+    async def _send_tts(self, message: str) -> None:
+        """Send a TTS announcement to configured media players."""
+        if self._is_quiet_hours():
+            _LOGGER.debug("Skipping TTS - quiet hours active")
+            return
+
+        targets = self._get_tts_targets()
+        if not targets:
+            return
+
+        options = self.entry.options
+        chime_enabled = options.get(CONF_CHIME_ENABLED, True)
+        tts_service = options.get(CONF_TTS_SERVICE, DEFAULT_TTS_SERVICE)
+        language = self.hass.config.language or "en"
+
+        for target in targets:
+            try:
+                # Play chime first if enabled
+                if chime_enabled:
+                    chime_path = f"/{DOMAIN}/chime.wav"
+                    if self.hass.services.has_service(
+                        "media_player", "play_media"
+                    ):
+                        await self.hass.services.async_call(
+                            "media_player",
+                            "play_media",
+                            {
+                                "entity_id": target,
+                                "media_content_id": chime_path,
+                                "media_content_type": "music",
+                            },
+                            blocking=True,
+                        )
+                        await asyncio.sleep(2.5)
+
+                # Send TTS
+                service_data: dict[str, Any] = {
+                    "entity_id": target,
+                    "message": message,
+                }
+                # google_translate_say and cloud_say accept language param
+                if tts_service in ("google_translate_say", "cloud_say"):
+                    service_data["language"] = language
+
+                if self.hass.services.has_service("tts", tts_service):
+                    await self.hass.services.async_call(
+                        "tts",
+                        tts_service,
+                        service_data,
+                        blocking=True,
+                    )
+                    _LOGGER.info("Sent TTS to %s: %s", target, message)
+                else:
+                    _LOGGER.warning(
+                        "TTS service tts.%s not available", tts_service
+                    )
+
+            except Exception as err:
+                _LOGGER.error(
+                    "Failed TTS to %s: %s", target, err, exc_info=True
+                )
+
+    async def _send_tts_for_chore(
+        self,
+        chore: dict[str, Any],
+        assignee: str | None,
+        is_reminder: bool,
+    ) -> None:
+        """Build and send TTS message for a chore trigger or reminder."""
+        if not self._get_tts_targets():
+            return
+
+        language = self.hass.config.language or "en"
+
+        if is_reminder:
+            if assignee:
+                first_name = self._get_first_name(assignee)
+                message = get_tts_message(
+                    language,
+                    "chore_reminder_assigned",
+                    name=first_name,
+                    chore=chore["name"],
+                )
+            else:
+                message = get_tts_message(
+                    language, "chore_reminder", chore=chore["name"]
+                )
+        else:
+            if assignee:
+                first_name = self._get_first_name(assignee)
+                message = get_tts_message(
+                    language,
+                    "chore_trigger",
+                    name=first_name,
+                    chore=chore["name"],
+                )
+            else:
+                message = get_tts_message(
+                    language,
+                    "chore_trigger_unassigned",
+                    chore=chore["name"],
+                )
+
+        await self._send_tts(message)
+
+    def _get_current_assignee(self, chore: dict[str, Any]) -> str | None:
+        """Get the current assignee entity_id without rotating."""
+        assignment = chore.get("assignment", {})
+        if assignment.get("mode") == "rotating":
+            assignees = assignment.get("assignees", [])
+            if assignees:
+                idx = assignment.get("current_index", 0)
+                # current_index points to NEXT, so the last assigned is previous
+                return assignees[(idx - 1) % len(assignees)]
+        elif assignment.get("mode") == "fixed":
+            assignees = assignment.get("assignees", [])
+            return assignees[0] if assignees else None
+        return None
+
+    async def _check_reminders(self) -> None:
+        """Check for incomplete todo items that need a TTS reminder."""
+        if not self._get_tts_targets():
+            return
+
+        now = dt_util.now()
+        options = self.entry.options
+        global_delay = options.get(
+            CONF_REMINDER_DELAY_HOURS, DEFAULT_REMINDER_DELAY_HOURS
+        )
+
+        for item in self.store.get_todo_items():
+            if item["status"] == "completed":
+                continue
+            if item.get("reminder_sent", False):
+                continue
+
+            chore_id = item.get("chore_id")
+            if not chore_id:
+                continue
+
+            chore = self.store.get_chore(chore_id)
+            if not chore:
+                continue
+
+            try:
+                created_at = datetime.fromisoformat(item["created_at"])
+            except (ValueError, TypeError):
+                continue
+
+            threshold = created_at + timedelta(hours=global_delay)
+            if now >= threshold:
+                assignee = self._get_current_assignee(chore)
+                await self._send_tts_for_chore(
+                    chore, assignee, is_reminder=True
+                )
+
+                # Mark reminder as sent to avoid repeating
+                await self.store.async_mark_reminder_sent(item["uid"])

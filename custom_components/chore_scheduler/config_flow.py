@@ -4,9 +4,32 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+import voluptuous as vol
 
-from .const import DOMAIN
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+)
+from homeassistant.core import callback
+from homeassistant.helpers import selector
+
+from .const import (
+    DOMAIN,
+    CONF_TTS_ENABLED,
+    CONF_TTS_TARGETS,
+    CONF_TTS_SERVICE,
+    CONF_QUIET_HOURS_START,
+    CONF_QUIET_HOURS_END,
+    CONF_REMINDER_DELAY_HOURS,
+    CONF_CHIME_ENABLED,
+    DEFAULT_QUIET_HOURS_START,
+    DEFAULT_QUIET_HOURS_END,
+    DEFAULT_REMINDER_DELAY_HOURS,
+    DEFAULT_TTS_SERVICE,
+    TTS_SERVICES,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,3 +54,91 @@ class ChoreSchedulerConfigFlow(ConfigFlow, domain=DOMAIN):
             )
 
         return self.async_show_form(step_id="user")
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
+        """Get the options flow for this handler."""
+        return ChoreSchedulerOptionsFlow(config_entry)
+
+
+class ChoreSchedulerOptionsFlow(OptionsFlow):
+    """Handle options flow for Chore Scheduler."""
+
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        """Initialize options flow."""
+        self._config_entry = config_entry
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Manage the options."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        options = self._config_entry.options
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_TTS_ENABLED,
+                        default=options.get(CONF_TTS_ENABLED, False),
+                    ): bool,
+                    vol.Optional(
+                        CONF_TTS_TARGETS,
+                        default=options.get(CONF_TTS_TARGETS, []),
+                    ): selector.EntitySelector(
+                        selector.EntitySelectorConfig(
+                            domain="media_player",
+                            multiple=True,
+                        )
+                    ),
+                    vol.Optional(
+                        CONF_TTS_SERVICE,
+                        default=options.get(CONF_TTS_SERVICE, DEFAULT_TTS_SERVICE),
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=[
+                                selector.SelectOptionDict(
+                                    value=s, label=s.replace("_", " ").title()
+                                )
+                                for s in TTS_SERVICES
+                            ],
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                        )
+                    ),
+                    vol.Optional(
+                        CONF_QUIET_HOURS_START,
+                        default=options.get(
+                            CONF_QUIET_HOURS_START, DEFAULT_QUIET_HOURS_START
+                        ),
+                    ): selector.TimeSelector(),
+                    vol.Optional(
+                        CONF_QUIET_HOURS_END,
+                        default=options.get(
+                            CONF_QUIET_HOURS_END, DEFAULT_QUIET_HOURS_END
+                        ),
+                    ): selector.TimeSelector(),
+                    vol.Optional(
+                        CONF_REMINDER_DELAY_HOURS,
+                        default=options.get(
+                            CONF_REMINDER_DELAY_HOURS, DEFAULT_REMINDER_DELAY_HOURS
+                        ),
+                    ): selector.NumberSelector(
+                        selector.NumberSelectorConfig(
+                            min=1,
+                            max=24,
+                            step=1,
+                            mode=selector.NumberSelectorMode.BOX,
+                            unit_of_measurement="hours",
+                        )
+                    ),
+                    vol.Optional(
+                        CONF_CHIME_ENABLED,
+                        default=options.get(CONF_CHIME_ENABLED, True),
+                    ): bool,
+                }
+            ),
+        )

@@ -207,6 +207,7 @@ class ChoreStore:
             "chore_id": chore_id,
             "created_at": dt_util.now().isoformat(),
             "completed_at": None,
+            "reminder_sent": False,
         }
         self._todo_items[uid] = item
         await self.async_save()
@@ -230,6 +231,12 @@ class ChoreStore:
 
         await self.async_save()
         return item
+
+    async def async_mark_reminder_sent(self, uid: str) -> None:
+        """Mark a todo item's reminder as sent."""
+        if uid in self._todo_items:
+            self._todo_items[uid]["reminder_sent"] = True
+            await self.async_save()
 
     async def async_delete_todo_items(self, uids: list[str]) -> None:
         """Delete todo items by UIDs."""

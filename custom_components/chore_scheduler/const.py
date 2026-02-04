@@ -62,3 +62,25 @@ SERVICE_UPDATE_CHORE: Final = "update_chore"
 SERVICE_DELETE_CHORE: Final = "delete_chore"
 SERVICE_TRIGGER_CHORE: Final = "trigger_chore"
 SERVICE_LIST_CHORES: Final = "list_chores"
+
+# TTS configuration keys
+CONF_TTS_ENABLED: Final = "tts_enabled"
+CONF_TTS_TARGETS: Final = "tts_targets"
+CONF_TTS_SERVICE: Final = "tts_service"
+CONF_QUIET_HOURS_START: Final = "quiet_hours_start"
+CONF_QUIET_HOURS_END: Final = "quiet_hours_end"
+CONF_REMINDER_DELAY_HOURS: Final = "reminder_delay_hours"
+CONF_CHIME_ENABLED: Final = "chime_enabled"
+
+# TTS defaults
+DEFAULT_QUIET_HOURS_START: Final = "21:00"
+DEFAULT_QUIET_HOURS_END: Final = "09:00"
+DEFAULT_REMINDER_DELAY_HOURS: Final = 2
+DEFAULT_TTS_SERVICE: Final = "google_translate_say"
+
+# TTS service options
+TTS_SERVICES: Final = [
+    "google_translate_say",
+    "cloud_say",
+    "speak",
+]

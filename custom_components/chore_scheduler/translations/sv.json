@@ -10,6 +10,29 @@
       "already_configured": "Sysslor är redan konfigurerat."
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sysslor inst\u00e4llningar",
+        "data": {
+          "tts_enabled": "Aktivera TTS-meddelanden",
+          "tts_targets": "TTS-h\u00f6gtalare",
+          "tts_service": "TTS-tj\u00e4nst",
+          "quiet_hours_start": "Tysta timmar b\u00f6rjar",
+          "quiet_hours_end": "Tysta timmar slutar",
+          "reminder_delay_hours": "P\u00e5minnelsef\u00f6rsening (timmar)",
+          "chime_enabled": "Spela signal f\u00f6re meddelande"
+        },
+        "data_description": {
+          "tts_targets": "Mediaspelare att meddela sysslor p\u00e5",
+          "tts_service": "Text-till-tal-tj\u00e4nst att anv\u00e4nda",
+          "quiet_hours_start": "Inga TTS-meddelanden efter denna tid",
+          "quiet_hours_end": "Inga TTS-meddelanden f\u00f6re denna tid",
+          "reminder_delay_hours": "Skicka p\u00e5minnelse om sysslan inte \u00e4r klar inom s\u00e5 m\u00e5nga timmar"
+        }
+      }
+    }
+  },
   "entity": {
     "sensor": {
       "chore_count": {

@@ -18,7 +18,7 @@ export const cardStyles = css`
 
   .card-header h1 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.625rem;
     font-weight: 500;
     color: var(--primary-text-color);
   }
@@ -38,7 +38,7 @@ export const cardStyles = css`
     border-radius: 18px;
     background: transparent;
     color: var(--primary-text-color);
-    font-size: 0.8rem;
+    font-size: 0.925rem;
     font-family: inherit;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
@@ -131,7 +131,7 @@ export const cardStyles = css`
     align-items: center;
     padding: 2px 8px;
     border-radius: 12px;
-    font-size: 0.7rem;
+    font-size: 0.825rem;
     font-weight: 500;
     white-space: nowrap;
   }
@@ -168,7 +168,7 @@ export const cardStyles = css`
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.65rem;
+    font-size: 0.775rem;
     font-weight: 600;
     color: var(--primary-text-color);
   }
@@ -185,7 +185,7 @@ export const cardStyles = css`
     display: inline-flex;
     align-items: center;
     gap: 2px;
-    font-size: 0.7rem;
+    font-size: 0.825rem;
     font-weight: 600;
     color: var(--warning-color, #ff9800);
     white-space: nowrap;
@@ -206,7 +206,7 @@ export const cardStyles = css`
   }
 
   .section-header {
-    font-size: 0.7rem;
+    font-size: 0.825rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -274,7 +274,7 @@ export const cardStyles = css`
   }
 
   .todo-summary {
-    font-size: 0.9rem;
+    font-size: 1.025rem;
     color: var(--primary-text-color);
     white-space: nowrap;
     overflow: hidden;
@@ -320,7 +320,7 @@ export const cardStyles = css`
   }
 
   .all-done p {
-    font-size: 1.1rem;
+    font-size: 1.225rem;
     font-weight: 500;
     color: var(--primary-text-color);
     margin: 0;
@@ -404,7 +404,7 @@ export const editorStyles = css`
     border: 1px solid var(--divider-color);
     background: var(--card-background-color);
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: 1rem;
     transition: all 0.2s;
   }
 

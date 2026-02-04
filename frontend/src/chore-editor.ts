@@ -72,7 +72,7 @@ export class ChoreEditor extends LitElement {
 
     .dialog-header h2 {
       margin: 0;
-      font-size: 1.125rem;
+      font-size: 1.25rem;
       font-weight: 500;
       color: var(--primary-text-color);
     }
@@ -93,7 +93,7 @@ export class ChoreEditor extends LitElement {
 
     .form-label {
       display: block;
-      font-size: 0.7rem;
+      font-size: 0.825rem;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -168,7 +168,7 @@ export class ChoreEditor extends LitElement {
     }
 
     .person-name {
-      font-size: 0.65rem;
+      font-size: 0.775rem;
       color: var(--primary-text-color);
       text-align: center;
       width: 100%;
@@ -224,7 +224,7 @@ export class ChoreEditor extends LitElement {
     }
 
     .schedule-type-chip span {
-      font-size: 0.75rem;
+      font-size: 0.875rem;
       font-weight: 500;
       color: var(--primary-text-color);
     }
@@ -259,7 +259,7 @@ export class ChoreEditor extends LitElement {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.7rem;
+      font-size: 0.825rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.15s ease;
@@ -308,13 +308,13 @@ export class ChoreEditor extends LitElement {
     }
 
     .optional-title {
-      font-size: 0.8rem;
+      font-size: 0.925rem;
       font-weight: 500;
       color: var(--primary-text-color);
     }
 
     .optional-desc {
-      font-size: 0.7rem;
+      font-size: 0.825rem;
       color: var(--secondary-text-color);
       margin-top: 2px;
     }
@@ -350,12 +350,12 @@ export class ChoreEditor extends LitElement {
     }
 
     .notify-option-title {
-      font-size: 0.8rem;
+      font-size: 0.925rem;
       color: var(--primary-text-color);
     }
 
     .notify-option-desc {
-      font-size: 0.7rem;
+      font-size: 0.825rem;
       color: var(--secondary-text-color);
     }
 
@@ -383,7 +383,7 @@ export class ChoreEditor extends LitElement {
     .btn {
       padding: 8px 16px;
       border-radius: 8px;
-      font-size: 0.875rem;
+      font-size: 1rem;
       font-weight: 500;
       cursor: pointer;
       border: none;

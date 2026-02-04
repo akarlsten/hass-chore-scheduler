@@ -10,6 +10,29 @@
       "already_configured": "Chore scheduler is already configured."
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Chore Scheduler settings",
+        "data": {
+          "tts_enabled": "Enable TTS announcements",
+          "tts_targets": "TTS speakers",
+          "tts_service": "TTS service",
+          "quiet_hours_start": "Quiet hours start",
+          "quiet_hours_end": "Quiet hours end",
+          "reminder_delay_hours": "Reminder delay (hours)",
+          "chime_enabled": "Play chime before announcement"
+        },
+        "data_description": {
+          "tts_targets": "Media players to announce chores on",
+          "tts_service": "Text-to-speech service to use",
+          "quiet_hours_start": "No TTS announcements after this time",
+          "quiet_hours_end": "No TTS announcements before this time",
+          "reminder_delay_hours": "Send a reminder if chore is not completed within this many hours"
+        }
+      }
+    }
+  },
   "entity": {
     "sensor": {
       "chore_count": {
