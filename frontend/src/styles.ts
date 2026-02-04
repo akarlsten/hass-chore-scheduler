@@ -336,21 +336,31 @@ export const cardStyles = css`
 
   /* ── All Done Celebration ────────────────────────────── */
 
-  @keyframes celebrate-in {
-    from { opacity: 0; transform: scale(0.9) translateY(10px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+  @keyframes celebrate-icon-in {
+    0%  { opacity: 0; transform: scale(0.3); }
+    40% { opacity: 1; transform: scale(1.18); }
+    60% { transform: scale(0.9); }
+    78% { transform: scale(1.08); }
+    90% { transform: scale(0.97); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes celebrate-text-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   .all-done {
     text-align: center;
     padding: 32px 16px;
-    animation: celebrate-in 0.4s ease-out;
   }
 
   .all-done ha-icon {
     --mdc-icon-size: 48px;
     color: var(--success-color, #4caf50);
     margin-bottom: 12px;
+    display: block;
+    animation: celebrate-icon-in 0.65s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .all-done p {
@@ -358,6 +368,7 @@ export const cardStyles = css`
     font-weight: 500;
     color: var(--primary-text-color);
     margin: 0;
+    animation: celebrate-text-in 0.35s ease-out 0.25s both;
   }
 
   /* ── Empty State ─────────────────────────────────────── */
@@ -385,7 +396,8 @@ export const cardStyles = css`
 
   @media (prefers-reduced-motion: reduce) {
     .todo-checkbox.completing,
-    .all-done,
+    .all-done ha-icon,
+    .all-done p,
     .todo-item.completing-item,
     .todo-list,
     .empty-state,

@@ -155,6 +155,6 @@ class ChoreSchedulerOptionsFlow(OptionsFlow):
                             unit_of_measurement="hours",
                         )
                     ),
-}
+                }
             ),
         )
