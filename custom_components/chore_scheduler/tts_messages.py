@@ -17,6 +17,9 @@ TTS_MESSAGES: dict[str, dict[str, str]] = {
 }
 
 
+SUPPORTED_LANGUAGES = list(TTS_MESSAGES.keys())
+
+
 def get_tts_message(language: str, key: str, **kwargs: str) -> str:
     """Get a localized TTS message."""
     lang_msgs = TTS_MESSAGES.get(language, TTS_MESSAGES["en"])

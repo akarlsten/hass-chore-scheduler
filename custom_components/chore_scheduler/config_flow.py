@@ -20,16 +20,18 @@ from .const import (
     CONF_TTS_ENABLED,
     CONF_TTS_TARGETS,
     CONF_TTS_SERVICE,
+    CONF_TTS_LANGUAGE,
     CONF_QUIET_HOURS_START,
     CONF_QUIET_HOURS_END,
     CONF_REMINDER_DELAY_HOURS,
-    CONF_CHIME_ENABLED,
     DEFAULT_QUIET_HOURS_START,
     DEFAULT_QUIET_HOURS_END,
     DEFAULT_REMINDER_DELAY_HOURS,
     DEFAULT_TTS_SERVICE,
+    DEFAULT_TTS_LANGUAGE,
     TTS_SERVICES,
 )
+from .tts_messages import SUPPORTED_LANGUAGES
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -110,6 +112,24 @@ class ChoreSchedulerOptionsFlow(OptionsFlow):
                         )
                     ),
                     vol.Optional(
+                        CONF_TTS_LANGUAGE,
+                        default=options.get(CONF_TTS_LANGUAGE, DEFAULT_TTS_LANGUAGE),
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=[
+                                selector.SelectOptionDict(
+                                    value="auto", label="Auto (HA system language)"
+                                ),
+                            ] + [
+                                selector.SelectOptionDict(
+                                    value=lang, label=lang.upper()
+                                )
+                                for lang in SUPPORTED_LANGUAGES
+                            ],
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                        )
+                    ),
+                    vol.Optional(
                         CONF_QUIET_HOURS_START,
                         default=options.get(
                             CONF_QUIET_HOURS_START, DEFAULT_QUIET_HOURS_START
@@ -135,10 +155,6 @@ class ChoreSchedulerOptionsFlow(OptionsFlow):
                             unit_of_measurement="hours",
                         )
                     ),
-                    vol.Optional(
-                        CONF_CHIME_ENABLED,
-                        default=options.get(CONF_CHIME_ENABLED, True),
-                    ): bool,
-                }
+}
             ),
         )

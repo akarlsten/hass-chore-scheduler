@@ -18,10 +18,10 @@
           "tts_enabled": "Aktivera TTS-meddelanden",
           "tts_targets": "TTS-h\u00f6gtalare",
           "tts_service": "TTS-tj\u00e4nst",
+          "tts_language": "TTS-spr\u00e5k",
           "quiet_hours_start": "Tysta timmar b\u00f6rjar",
           "quiet_hours_end": "Tysta timmar slutar",
-          "reminder_delay_hours": "P\u00e5minnelsef\u00f6rsening (timmar)",
-          "chime_enabled": "Spela signal f\u00f6re meddelande"
+          "reminder_delay_hours": "P\u00e5minnelsef\u00f6rsening (timmar)"
         },
         "data_description": {
           "tts_targets": "Mediaspelare att meddela sysslor p\u00e5",

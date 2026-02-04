@@ -67,16 +67,16 @@ SERVICE_LIST_CHORES: Final = "list_chores"
 CONF_TTS_ENABLED: Final = "tts_enabled"
 CONF_TTS_TARGETS: Final = "tts_targets"
 CONF_TTS_SERVICE: Final = "tts_service"
+CONF_TTS_LANGUAGE: Final = "tts_language"
 CONF_QUIET_HOURS_START: Final = "quiet_hours_start"
 CONF_QUIET_HOURS_END: Final = "quiet_hours_end"
 CONF_REMINDER_DELAY_HOURS: Final = "reminder_delay_hours"
-CONF_CHIME_ENABLED: Final = "chime_enabled"
-
 # TTS defaults
 DEFAULT_QUIET_HOURS_START: Final = "21:00"
 DEFAULT_QUIET_HOURS_END: Final = "09:00"
 DEFAULT_REMINDER_DELAY_HOURS: Final = 2
 DEFAULT_TTS_SERVICE: Final = "google_translate_say"
+DEFAULT_TTS_LANGUAGE: Final = "auto"
 
 # TTS service options
 TTS_SERVICES: Final = [

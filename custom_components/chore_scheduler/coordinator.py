@@ -1,7 +1,6 @@
 """Coordinator for the Chore Scheduler integration."""
 from __future__ import annotations
 
-import asyncio
 import calendar
 from datetime import datetime, timedelta
 import logging
@@ -21,10 +20,11 @@ from .const import (
     CONF_TTS_ENABLED,
     CONF_TTS_TARGETS,
     CONF_TTS_SERVICE,
+    CONF_TTS_LANGUAGE,
     CONF_QUIET_HOURS_START,
     CONF_QUIET_HOURS_END,
     CONF_REMINDER_DELAY_HOURS,
-    CONF_CHIME_ENABLED,
+    DEFAULT_TTS_LANGUAGE,
     DEFAULT_QUIET_HOURS_START,
     DEFAULT_QUIET_HOURS_END,
     DEFAULT_REMINDER_DELAY_HOURS,
@@ -466,6 +466,13 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             .split()[0]
         )
 
+    def _get_language(self) -> str:
+        """Get the configured TTS language, falling back to HA system language."""
+        lang = self.entry.options.get(CONF_TTS_LANGUAGE, DEFAULT_TTS_LANGUAGE)
+        if lang == "auto":
+            return self.hass.config.language or "en"
+        return lang
+
     def _is_quiet_hours(self) -> bool:
         """Check if current time is within quiet hours."""
         now = dt_util.now()
@@ -496,9 +503,14 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     def _get_tts_targets(self) -> list[str]:
         """Get the configured TTS media_player targets."""
         options = self.entry.options
-        if not options.get(CONF_TTS_ENABLED, False):
+        tts_enabled = options.get(CONF_TTS_ENABLED, False)
+        if not tts_enabled:
+            _LOGGER.debug("TTS is disabled in options (CONF_TTS_ENABLED=%s)", tts_enabled)
             return []
-        return options.get(CONF_TTS_TARGETS, [])
+        targets = options.get(CONF_TTS_TARGETS, [])
+        if not targets:
+            _LOGGER.debug("TTS enabled but no targets configured (CONF_TTS_TARGETS=%s)", targets)
+        return targets
 
     async def _send_tts(self, message: str) -> None:
         """Send a TTS announcement to configured media players."""
@@ -508,43 +520,28 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         targets = self._get_tts_targets()
         if not targets:
+            _LOGGER.debug("Skipping TTS - no targets configured or TTS disabled")
             return
 
         options = self.entry.options
-        chime_enabled = options.get(CONF_CHIME_ENABLED, True)
         tts_service = options.get(CONF_TTS_SERVICE, DEFAULT_TTS_SERVICE)
-        language = self.hass.config.language or "en"
+        language = self._get_language()
 
         for target in targets:
             try:
-                # Play chime first if enabled
-                if chime_enabled:
-                    chime_path = f"/{DOMAIN}/chime.wav"
-                    if self.hass.services.has_service(
-                        "media_player", "play_media"
-                    ):
-                        await self.hass.services.async_call(
-                            "media_player",
-                            "play_media",
-                            {
-                                "entity_id": target,
-                                "media_content_id": chime_path,
-                                "media_content_type": "music",
-                            },
-                            blocking=True,
-                        )
-                        await asyncio.sleep(2.5)
-
-                # Send TTS
                 service_data: dict[str, Any] = {
                     "entity_id": target,
                     "message": message,
                 }
-                # google_translate_say and cloud_say accept language param
-                if tts_service in ("google_translate_say", "cloud_say"):
+                # google_translate_say needs explicit language; cloud_say uses system language
+                if tts_service == "google_translate_say":
                     service_data["language"] = language
 
                 if self.hass.services.has_service("tts", tts_service):
+                    _LOGGER.debug(
+                        "Calling tts.%s for %s with data: %s",
+                        tts_service, target, service_data,
+                    )
                     await self.hass.services.async_call(
                         "tts",
                         tts_service,
@@ -570,9 +567,13 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     ) -> None:
         """Build and send TTS message for a chore trigger or reminder."""
         if not self._get_tts_targets():
+            _LOGGER.debug(
+                "Skipping TTS for chore '%s' - no targets configured or TTS disabled",
+                chore.get("name", "?"),
+            )
             return
 
-        language = self.hass.config.language or "en"
+        language = self._get_language()
 
         if is_reminder:
             if assignee:

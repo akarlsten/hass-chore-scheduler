@@ -18,10 +18,10 @@
           "tts_enabled": "Enable TTS announcements",
           "tts_targets": "TTS speakers",
           "tts_service": "TTS service",
+          "tts_language": "TTS language",
           "quiet_hours_start": "Quiet hours start",
           "quiet_hours_end": "Quiet hours end",
-          "reminder_delay_hours": "Reminder delay (hours)",
-          "chime_enabled": "Play chime before announcement"
+          "reminder_delay_hours": "Reminder delay (hours)"
         },
         "data_description": {
           "tts_targets": "Media players to announce chores on",

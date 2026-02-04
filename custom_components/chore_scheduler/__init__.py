@@ -262,7 +262,7 @@ async def _async_register_frontend(hass: HomeAssistant) -> None:
     frontend_path = Path(__file__).parent / "www" / "chore-scheduler-card.js"
 
     if frontend_path.exists():
-        # Register static paths (card JS + chime audio)
+        # Register static paths (card JS)
         static_paths = [
             StaticPathConfig(
                 FRONTEND_SCRIPT_URL,
@@ -270,17 +270,6 @@ async def _async_register_frontend(hass: HomeAssistant) -> None:
                 cache_headers=False,
             ),
         ]
-
-        # Register chime audio if it exists
-        chime_path = Path(__file__).parent / "www" / "chime.wav"
-        if chime_path.exists():
-            static_paths.append(
-                StaticPathConfig(
-                    f"/{DOMAIN}/chime.wav",
-                    str(chime_path),
-                    cache_headers=True,
-                )
-            )
 
         await hass.http.async_register_static_paths(static_paths)
 
