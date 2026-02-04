@@ -1,0 +1,57 @@
+import styled, { css } from 'styled-components'
+import { TodoItem as TodoItemType, Chore } from '@types'
+import TodoItem from './TodoItem'
+
+interface TodoSectionProps {
+  title: string
+  items: TodoItemType[]
+  chores: Chore[]
+  sectionClass: string
+}
+
+const TodoSection = ({ title, items, chores, sectionClass }: TodoSectionProps) => {
+  return (
+    <Section>
+      <SectionHeader $isOverdue={sectionClass === 'overdue'}>{title}</SectionHeader>
+      <TodoList>
+        {items.map((item) => (
+          <TodoItem
+            key={item.uid}
+            item={item}
+            chore={chores.find((c) => c.id === item.chore_id)}
+            sectionClass={sectionClass}
+          />
+        ))}
+      </TodoList>
+    </Section>
+  )
+}
+
+export default TodoSection
+
+const Section = styled.div`
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`
+
+const SectionHeader = styled.div<{ $isOverdue?: boolean }>`
+  font-size: 0.825rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--secondary-text-color);
+  padding: 4px 0 8px 0;
+
+  ${(p) => p.$isOverdue && css`
+    color: var(--error-color, #f44336);
+  `}
+`
+
+const TodoList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`

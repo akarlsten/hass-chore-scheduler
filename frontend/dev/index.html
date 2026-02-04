@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chore Scheduler Card - Dev</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+  <style>
+    /* ── HA Design System CSS Variables ────────────────────────────── */
+    :root {
+      /* Border & spacing tokens */
+      --ha-border-width-sm: 1px;
+      --ha-border-width-md: 2px;
+      --ha-border-radius-sm: 4px;
+      --ha-border-radius-md: 8px;
+      --ha-border-radius-lg: 12px;
+      --ha-border-radius-xl: 16px;
+      --ha-border-radius-2xl: 20px;
+      --ha-border-radius-3xl: 24px;
+      --ha-border-radius-pill: 9999px;
+      --ha-border-radius-circle: 50%;
+
+      /* Spacing */
+      --ha-space-1: 4px;
+      --ha-space-2: 8px;
+      --ha-space-3: 12px;
+      --ha-space-4: 16px;
+      --ha-space-6: 24px;
+      --ha-space-8: 32px;
+
+      /* Typography */
+      --ha-font-family-body: Roboto, Noto, sans-serif;
+      --ha-font-size-scale: 1;
+      --ha-font-size-xs: calc(10px * var(--ha-font-size-scale));
+      --ha-font-size-s: calc(12px * var(--ha-font-size-scale));
+      --ha-font-size-m: calc(14px * var(--ha-font-size-scale));
+      --ha-font-size-l: calc(16px * var(--ha-font-size-scale));
+      --ha-font-size-xl: calc(20px * var(--ha-font-size-scale));
+      --ha-font-size-2xl: calc(24px * var(--ha-font-size-scale));
+      --ha-font-weight-light: 300;
+      --ha-font-weight-normal: 400;
+      --ha-font-weight-medium: 500;
+      --ha-font-weight-bold: 700;
+      --ha-line-height-condensed: 1.2;
+      --ha-line-height-normal: 1.6;
+      --ha-font-smoothing: antialiased;
+
+      /* Shadows */
+      --ha-box-shadow-s: 0 2px 4px rgba(0,0,0,0.1);
+      --ha-box-shadow-m: 0 4px 8px rgba(0,0,0,0.12);
+      --ha-box-shadow-l: 0 8px 12px rgba(0,0,0,0.16);
+
+      /* Color palette - light theme */
+      --ha-color-primary-40: #009ac7;
+      --ha-color-primary-50: #18bcf2;
+      --ha-color-primary-80: #b9e6fc;
+      --ha-color-primary-90: #dff3fc;
+      --ha-color-neutral-05: #141414;
+      --ha-color-neutral-40: #5e5e5e;
+      --ha-color-neutral-60: #989898;
+      --ha-color-neutral-80: #cccccc;
+      --ha-color-neutral-90: #e6e6e6;
+      --ha-color-neutral-95: #f3f3f3;
+      --ha-color-red-50: #dc3146;
+      --ha-color-green-50: #00883c;
+      --ha-color-orange-60: #f36d00;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      font-size: 14px;
+      height: 100vh;
+      background-color: var(--primary-background-color);
+      color: var(--primary-text-color);
+      -webkit-font-smoothing: var(--ha-font-smoothing);
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: var(--ha-font-family-body);
+      font-size: var(--ha-font-size-m);
+      font-weight: var(--ha-font-weight-normal);
+      line-height: var(--ha-line-height-normal);
+      background: var(--primary-background-color);
+      color: var(--primary-text-color);
+
+      /* HA theme CSS custom properties - light theme defaults */
+      --primary-color: var(--ha-color-primary-40, #03a9f4);
+      --rgb-primary-color: 0, 154, 199;
+      --primary-text-color: #212121;
+      --rgb-primary-text-color: 33, 33, 33;
+      --secondary-text-color: #727272;
+      --rgb-secondary-text-color: 114, 114, 114;
+      --disabled-text-color: #bdbdbd;
+      --primary-background-color: #fafafa;
+      --secondary-background-color: #e5e5e5;
+      --card-background-color: #ffffff;
+      --ha-card-background: #ffffff;
+      --divider-color: rgba(0, 0, 0, 0.12);
+      --outline-color: rgba(0, 0, 0, 0.12);
+      --error-color: #db4437;
+      --warning-color: #ffa600;
+      --success-color: #43a047;
+      --info-color: #039be5;
+      --text-primary-color: #ffffff;
+      --text-light-primary-color: #212121;
+
+      /* Label badges */
+      --label-badge-grey: #9e9e9e;
+      --label-badge-green: #4caf50;
+      --label-badge-blue: #2196f3;
+      --label-badge-purple: #9c27b0;
+      --label-badge-yellow: #ff9800;
+      --label-badge-red: var(--error-color);
+
+      /* State colors */
+      --state-icon-color: #44739e;
+      --state-active-color: #ffa600;
+      --state-inactive-color: #9e9e9e;
+
+      /* MDC compatibility */
+      --mdc-theme-primary: var(--primary-color);
+      --mdc-theme-on-primary: var(--text-primary-color);
+      --mdc-theme-surface: var(--card-background-color);
+      --mdc-theme-on-surface: var(--primary-text-color);
+      --mdc-ripple-color: var(--primary-color);
+    }
+
+    body.dark-theme {
+      --primary-color: var(--ha-color-primary-40, #009ac7);
+      --rgb-primary-color: 0, 154, 199;
+      --primary-background-color: #111111;
+      --secondary-background-color: #1c1c1c;
+      --card-background-color: #1e1e1e;
+      --ha-card-background: #1e1e1e;
+      --primary-text-color: #e1e1e1;
+      --rgb-primary-text-color: 225, 225, 225;
+      --secondary-text-color: #9b9b9b;
+      --rgb-secondary-text-color: 155, 155, 155;
+      --divider-color: rgba(255, 255, 255, 0.12);
+      --outline-color: rgba(255, 255, 255, 0.12);
+      --disabled-text-color: #6f6f6f;
+      --text-primary-color: #212121;
+      --text-light-primary-color: #e1e1e1;
+      --state-icon-color: #69b0d4;
+      --scrollbar-thumb-color: rgb(80, 80, 80);
+    }
+
+    .dev-controls {
+      max-width: 450px;
+      margin: 0 auto 16px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .dev-controls button {
+      padding: 6px 12px;
+      border: 1px solid var(--divider-color);
+      border-radius: 6px;
+      background: var(--card-background-color);
+      color: var(--primary-text-color);
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .dev-controls button:hover {
+      background: var(--secondary-background-color);
+    }
+
+    chore-scheduler-card {
+      display: block;
+      max-width: 450px;
+      margin: 0 auto;
+    }
+
+    /* Stub ha-card styling */
+    ha-card {
+      display: block;
+      border-radius: var(--ha-card-border-radius, var(--ha-border-radius-xl, 12px));
+      background: var(--ha-card-background, var(--card-background-color));
+      box-shadow: var(--ha-card-box-shadow, var(--ha-box-shadow-m, 0 2px 6px rgba(0, 0, 0, 0.15)));
+      border-width: var(--ha-card-border-width, 0);
+      border-style: solid;
+      border-color: var(--ha-card-border-color, var(--divider-color));
+      color: var(--primary-text-color);
+      overflow: hidden;
+    }
+
+    /* Stub ha-icon styling */
+    ha-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--mdc-icon-size, 24px);
+      height: var(--mdc-icon-size, 24px);
+      fill: currentColor;
+    }
+
+    ha-icon::before {
+      font-family: 'Material Design Icons';
+      font-size: var(--mdc-icon-size, 24px);
+      line-height: 1;
+    }
+
+    /* Stub ha-textfield */
+    ha-textfield {
+      display: block;
+    }
+
+    ha-textfield input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--divider-color);
+      border-radius: 8px;
+      background: var(--card-background-color);
+      color: var(--primary-text-color);
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+    }
+
+    ha-textfield input:focus {
+      border-color: var(--primary-color);
+    }
+
+    /* Stub ha-switch */
+    ha-switch {
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    /* Stub ha-circular-progress */
+    ha-circular-progress {
+      display: inline-block;
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--divider-color);
+      border-top-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Stub ha-icon-button */
+    ha-icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    ha-icon-button:hover {
+      background: var(--secondary-background-color);
+    }
+
+    /* Stub ha-checkbox */
+    ha-checkbox {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--secondary-text-color);
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    /* Stub ha-select */
+    ha-select {
+      display: block;
+    }
+
+    /* Stub ha-list-item */
+    ha-list-item {
+      display: block;
+      padding: 8px 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="dev-controls">
+    <button onclick="toggleTheme()">Toggle Dark/Light</button>
+    <button onclick="reloadData()">Reload Data</button>
+    <button onclick="toggleLang()">Toggle EN/SV</button>
+  </div>
+
+  <chore-scheduler-card></chore-scheduler-card>
+
+  <script>
+    // ── Mock Data ──────────────────────────────────────────────────
+
+    const today = new Date().toISOString().split('T')[0]
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0]
+
+    const mockChores = [
+      {
+        id: 'chore_1', name: 'Vacuum living room', description: 'All floors',
+        schedule: { type: 'weekly', days: ['monday', 'thursday'], time: '10:00', interval: 1 },
+        assignment: { mode: 'fixed', assignees: ['person.adam'], current_index: 0 },
+        notifications: { enabled: true, remind_before: 60, notify_targets: ['notify.mobile_app_adams_phone'] },
+        enabled: true, last_triggered: yesterday,
+      },
+      {
+        id: 'chore_2', name: 'Take out trash', description: '',
+        schedule: { type: 'daily', time: '08:00', interval: 1 },
+        assignment: { mode: 'unassigned', assignees: [], current_index: 0 },
+        notifications: { enabled: false, remind_before: 60, notify_targets: [] },
+        enabled: true, last_triggered: today,
+      },
+      {
+        id: 'chore_3', name: 'Clean bathroom', description: 'Scrub tiles + toilet',
+        schedule: { type: 'weekly', days: ['saturday'], time: '09:00', interval: 1 },
+        assignment: { mode: 'fixed', assignees: ['person.lisa'], current_index: 0 },
+        notifications: { enabled: true, remind_before: 60, notify_targets: ['persistent_notification'] },
+        enabled: true, last_triggered: null,
+      },
+      {
+        id: 'chore_4', name: 'Pay rent', description: '',
+        schedule: { type: 'monthly', day_of_month: 1, time: '12:00', interval: 1 },
+        assignment: { mode: 'fixed', assignees: ['person.adam'], current_index: 0 },
+        notifications: { enabled: false, remind_before: 60, notify_targets: [] },
+        enabled: true, last_triggered: null,
+      },
+      {
+        id: 'chore_5', name: 'Walk the dog', description: '',
+        schedule: { type: 'daily', time: '07:00', interval: 1 },
+        assignment: { mode: 'fixed', assignees: ['person.lisa'], current_index: 0 },
+        notifications: { enabled: false, remind_before: 60, notify_targets: [] },
+        enabled: false, last_triggered: null,
+      },
+    ]
+
+    const mockTodos = [
+      {
+        uid: 'todo_1', summary: 'Vacuum living room (Adam)', status: 'needs_action',
+        due: yesterday, chore_id: 'chore_1', created_at: yesterday,
+        chore_name: 'Vacuum living room', schedule_type: 'weekly',
+        assignment: { mode: 'fixed', assignees: ['person.adam'], current_index: 0 },
+        completion_stats: { last_completed: yesterday, streak: 5, total_completions: 12 },
+      },
+      {
+        uid: 'todo_2', summary: 'Take out trash', status: 'needs_action',
+        due: today, chore_id: 'chore_2', created_at: today,
+        chore_name: 'Take out trash', schedule_type: 'daily',
+        completion_stats: { last_completed: yesterday, streak: 3, total_completions: 30 },
+      },
+      {
+        uid: 'todo_3', summary: 'Clean bathroom (Lisa)', status: 'needs_action',
+        due: tomorrow, chore_id: 'chore_3', created_at: today,
+        chore_name: 'Clean bathroom', schedule_type: 'weekly',
+        assignment: { mode: 'fixed', assignees: ['person.lisa'], current_index: 0 },
+        completion_stats: { last_completed: null, streak: 0, total_completions: 0 },
+      },
+      {
+        uid: 'todo_4', summary: 'Walk the dog (Lisa)', status: 'completed',
+        due: today, chore_id: 'chore_5', created_at: today, completed_at: today,
+        chore_name: 'Walk the dog', schedule_type: 'daily',
+        assignment: { mode: 'fixed', assignees: ['person.lisa'], current_index: 0 },
+        completion_stats: { last_completed: today, streak: 1, total_completions: 5 },
+      },
+    ]
+
+    // ── Mock hass object ──────────────────────────────────────────
+
+    let currentLang = 'en'
+
+    function createMockHass() {
+      return {
+        language: currentLang,
+        user: { id: 'user1', name: 'Adam', is_admin: true },
+        states: {
+          'person.adam': {
+            entity_id: 'person.adam',
+            state: 'home',
+            attributes: { friendly_name: 'Adam Karlsten', entity_picture: null },
+            last_changed: today, last_updated: today,
+          },
+          'person.lisa': {
+            entity_id: 'person.lisa',
+            state: 'home',
+            attributes: { friendly_name: 'Lisa Svensson', entity_picture: null },
+            last_changed: today, last_updated: today,
+          },
+        },
+        services: {
+          notify: {
+            mobile_app_adams_phone: {},
+            mobile_app_lisas_phone: {},
+          },
+        },
+        connection: {
+          sendMessagePromise(msg) {
+            console.log('[Mock] sendMessagePromise:', msg.type, msg)
+            if (msg.type === 'chore_scheduler/list') {
+              return Promise.resolve({ chores: mockChores })
+            }
+            if (msg.type === 'chore_scheduler/todos') {
+              return Promise.resolve({ items: mockTodos })
+            }
+            if (msg.type === 'chore_scheduler/complete_todo') {
+              console.log('[Mock] Completing todo:', msg.uid)
+              return Promise.resolve({})
+            }
+            return Promise.resolve({})
+          },
+        },
+        callService(domain, service, data) {
+          console.log(`[Mock] callService: ${domain}.${service}`, data)
+          return Promise.resolve()
+        },
+        callApi(method, path, data) {
+          console.log(`[Mock] callApi: ${method} ${path}`, data)
+          return Promise.resolve({})
+        },
+      }
+    }
+
+    // ── Register stub custom elements ─────────────────────────────
+
+    // ha-icon: render MDI icons using the MDI webfont
+    if (!customElements.get('ha-icon')) {
+      class HaIcon extends HTMLElement {
+        static get observedAttributes() { return ['icon'] }
+        connectedCallback() { this._render() }
+        attributeChangedCallback() { this._render() }
+        _render() {
+          const icon = this.getAttribute('icon') || ''
+          const mdiName = icon.replace('mdi:', '')
+          this.innerHTML = `<i class="mdi mdi-${mdiName}" style="font-size: var(--mdc-icon-size, 24px); line-height: 1;"></i>`
+        }
+      }
+      customElements.define('ha-icon', HaIcon)
+    }
+
+    // ha-textfield
+    if (!customElements.get('ha-textfield')) {
+      class HaTextField extends HTMLElement {
+        connectedCallback() { this._render() }
+        static get observedAttributes() { return ['value', 'label', 'type', 'placeholder'] }
+        attributeChangedCallback() { this._render() }
+        get value() { return this.querySelector('input')?.value || this.getAttribute('value') || '' }
+        set value(v) { if (this.querySelector('input')) this.querySelector('input').value = v; this.setAttribute('value', v) }
+        _render() {
+          if (this.querySelector('input')) return
+          const input = document.createElement('input')
+          input.type = this.getAttribute('type') || 'text'
+          input.value = this.getAttribute('value') || ''
+          input.placeholder = this.getAttribute('placeholder') || this.getAttribute('label') || ''
+          input.addEventListener('input', (e) => {
+            this.dispatchEvent(new Event('input', { bubbles: true }))
+          })
+          this.appendChild(input)
+        }
+      }
+      customElements.define('ha-textfield', HaTextField)
+    }
+
+    // ha-switch
+    if (!customElements.get('ha-switch')) {
+      class HaSwitchEl extends HTMLElement {
+        _checked = false
+        get checked() { return this._checked }
+        set checked(v) {
+          this._checked = !!v
+          this.style.background = this._checked ? 'var(--primary-color)' : 'var(--divider-color)'
+        }
+        connectedCallback() {
+          this.style.borderRadius = '10px'
+          this.style.background = this._checked ? 'var(--primary-color)' : 'var(--divider-color)'
+          this.addEventListener('click', () => {
+            this._checked = !this._checked
+            this.style.background = this._checked ? 'var(--primary-color)' : 'var(--divider-color)'
+            this.dispatchEvent(new Event('change', { bubbles: true }))
+          })
+        }
+      }
+      customElements.define('ha-switch', HaSwitchEl)
+    }
+
+    // ha-checkbox
+    if (!customElements.get('ha-checkbox')) {
+      class HaCheckboxEl extends HTMLElement {
+        _checked = false
+        get checked() { return this._checked }
+        set checked(v) {
+          this._checked = !!v
+          this.style.background = this._checked ? 'var(--primary-color)' : 'transparent'
+          this.style.borderColor = this._checked ? 'var(--primary-color)' : 'var(--secondary-text-color)'
+        }
+        connectedCallback() {
+          this.checked = this._checked
+        }
+      }
+      customElements.define('ha-checkbox', HaCheckboxEl)
+    }
+
+    // ha-select, ha-list-item, ha-card, ha-icon-button, ha-circular-progress
+    for (const tag of ['ha-card', 'ha-icon-button', 'ha-circular-progress', 'ha-select', 'ha-list-item']) {
+      if (!customElements.get(tag)) {
+        customElements.define(tag, class extends HTMLElement {})
+      }
+    }
+
+    // ── Mount card ────────────────────────────────────────────────
+
+    const card = document.querySelector('chore-scheduler-card')
+
+    function mountCard() {
+      card.setConfig({
+        type: 'custom:chore-scheduler-card',
+        title: 'Chore Scheduler',
+        show_completed: true,
+        enable_animations: true,
+      })
+      card.hass = createMockHass()
+    }
+
+    function reloadData() {
+      card.hass = createMockHass()
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark-theme')
+    }
+
+    function toggleLang() {
+      currentLang = currentLang === 'en' ? 'sv' : 'en'
+      card.hass = createMockHass()
+    }
+
+    // Wait for the card script to load, then mount
+    window.addEventListener('load', () => {
+      // Small delay to ensure custom element is registered
+      setTimeout(mountCard, 100)
+    })
+  </script>
+  <script src="/chore-scheduler-card.js"></script>
+</body>
+</html>
