@@ -154,6 +154,14 @@ class ChoreSchedulerTodoList(TodoListEntity):
 
         await self._store.async_update_todo_item(item.uid, **updates)
 
+        # Check if all chores are done - stop casting early if so
+        if (
+            item.status is not None
+            and item.status == TodoItemStatus.COMPLETED
+            and not was_completed
+        ):
+            self._coordinator.check_cast_all_done()
+
         # Auto-remove one-time chores after completion
         if (
             item.status is not None

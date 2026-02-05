@@ -743,6 +743,26 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             "Scheduled cast stop for %s in %d minutes", cast_target, cast_duration
         )
 
+    def check_cast_all_done(self) -> None:
+        """If casting and all todos are done, shorten the cast timer to 1 minute."""
+        if not self._cast_timer_cancel:
+            return
+
+        items = self.store.get_todo_items()
+        if not items:
+            return
+
+        all_done = all(item.get("status") == "completed" for item in items)
+        if not all_done:
+            return
+
+        _LOGGER.info("All chores completed while casting - stopping cast in 1 minute")
+        self._cast_timer_cancel()
+        stop_time = dt_util.utcnow() + timedelta(minutes=1)
+        self._cast_timer_cancel = async_track_point_in_time(
+            self.hass, self._async_stop_cast, stop_time
+        )
+
     async def _async_stop_cast(self, now: datetime) -> None:
         """Stop casting after timeout."""
         self._cast_timer_cancel = None
