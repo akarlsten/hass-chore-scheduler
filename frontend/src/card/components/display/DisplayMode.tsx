@@ -1,3 +1,4 @@
+import styled from 'styled-components'
 import { TodoItem, Chore, ChoreSchedulerCardConfig } from '@types'
 import { useLocalize } from '@hooks'
 import TodoSection from './TodoSection'
@@ -30,31 +31,51 @@ const DisplayMode = ({ todoItems, chores, config }: DisplayModeProps) => {
 
   if (pending.length === 0 && completed.length > 0) {
     return (
-      <>
+      <Container>
         <AllDoneState />
+        <Spacer />
         {config.show_completed && (
           <TodoSection title={t('display.done')} items={completed} chores={chores} sectionClass="completed" />
         )}
-      </>
+      </Container>
     )
   }
 
   return (
-    <>
-      {overdue.length > 0 && (
-        <TodoSection title={t('display.overdue')} items={overdue} chores={chores} sectionClass="overdue" />
-      )}
-      {todayItems.length > 0 && (
-        <TodoSection title={t('display.today')} items={todayItems} chores={chores} sectionClass="today" />
-      )}
-      {upcoming.length > 0 && (
-        <TodoSection title={t('display.upcoming')} items={upcoming} chores={chores} sectionClass="upcoming" />
-      )}
+    <Container>
+      <PendingSections>
+        {overdue.length > 0 && (
+          <TodoSection title={t('display.overdue')} items={overdue} chores={chores} sectionClass="overdue" />
+        )}
+        {todayItems.length > 0 && (
+          <TodoSection title={t('display.today')} items={todayItems} chores={chores} sectionClass="today" />
+        )}
+        {upcoming.length > 0 && (
+          <TodoSection title={t('display.upcoming')} items={upcoming} chores={chores} sectionClass="upcoming" />
+        )}
+      </PendingSections>
       {config.show_completed && completed.length > 0 && (
-        <TodoSection title={t('display.done')} items={completed} chores={chores} sectionClass="completed" />
+        <>
+          <Spacer />
+          <TodoSection title={t('display.done')} items={completed} chores={chores} sectionClass="completed" />
+        </>
       )}
-    </>
+    </Container>
   )
 }
 
 export default DisplayMode
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+`
+
+const PendingSections = styled.div``
+
+const Spacer = styled.div`
+  flex: 1;
+  min-height: 16px;
+`

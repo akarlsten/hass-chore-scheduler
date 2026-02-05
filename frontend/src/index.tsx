@@ -1,6 +1,6 @@
+import { CardMode, ChoreSchedulerCardConfig, HomeAssistant, LovelaceCardConfig } from '@types'
 import { render } from 'preact'
 import { StyleSheetManager } from 'styled-components'
-import { HomeAssistant, ChoreSchedulerCardConfig, CardMode, LovelaceCardConfig } from '@types'
 import StoreProviderWrapper from './card'
 import CardEditor from './config-editor'
 
@@ -30,6 +30,11 @@ class ChoreSchedulerCardElement extends HTMLElement {
   }
 
   connectedCallback() {
+    // Make the element fill available viewport height
+    this.style.display = 'flex'
+    this.style.flexDirection = 'column'
+    this.style.minHeight = 'calc(100vh - 90px)'
+
     // When HA re-attaches the element (e.g. tab switch), the styled-components
     // CSSStyleSheet is invalidated. Force a clean re-render.
     this._teardown()
@@ -70,6 +75,11 @@ class ChoreSchedulerCardElement extends HTMLElement {
   private _ensureCard() {
     if (!this._card) {
       this._card = document.createElement('ha-card')
+      // Make ha-card fill height and use flexbox
+      this._card.style.display = 'flex'
+      this._card.style.flexDirection = 'column'
+      this._card.style.flex = '1'
+      this._card.style.minHeight = '0'
       this.appendChild(this._card)
     }
     return this._card
@@ -87,7 +97,9 @@ class ChoreSchedulerCardElement extends HTMLElement {
   }
 }
 
-customElements.define('chore-scheduler-card', ChoreSchedulerCardElement)
+if (!customElements.get('chore-scheduler-card')) {
+  customElements.define('chore-scheduler-card', ChoreSchedulerCardElement)
+}
 
 // ── Config Editor Element ───────────────────────────────────────────
 
@@ -142,7 +154,9 @@ class ChoreSchedulerCardEditorElement extends HTMLElement {
   }
 }
 
-customElements.define('chore-scheduler-card-editor', ChoreSchedulerCardEditorElement)
+if (!customElements.get('chore-scheduler-card-editor')) {
+  customElements.define('chore-scheduler-card-editor', ChoreSchedulerCardEditorElement)
+}
 
 // ── Card Registration ───────────────────────────────────────────────
 

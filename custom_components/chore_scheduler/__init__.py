@@ -282,3 +282,4 @@ async def _async_register_frontend(hass: HomeAssistant) -> None:
             "Frontend file not found at %s. Card will not be available.",
             frontend_path,
         )
+

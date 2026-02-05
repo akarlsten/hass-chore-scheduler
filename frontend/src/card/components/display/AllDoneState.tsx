@@ -32,13 +32,18 @@ const celebrateTextIn = keyframes`
 `
 
 const Root = styled.div`
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
   padding: 32px 16px;
 `
 
 const CelebrateIcon = styled.div`
   ha-icon {
-    --mdc-icon-size: 48px;
+    --mdc-icon-size: 64px;
     color: var(--success-color, #4caf50);
     margin-bottom: 12px;
     display: block;
@@ -53,7 +58,7 @@ const CelebrateIcon = styled.div`
 `
 
 const CelebrateText = styled.p`
-  font-size: 1.225rem;
+  font-size: 1.5rem;
   font-weight: 500;
   color: var(--primary-text-color);
   margin: 0;

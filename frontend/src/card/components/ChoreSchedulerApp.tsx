@@ -69,24 +69,26 @@ const ChoreSchedulerApp = () => {
         onAddChore={handleAddChore}
       />
 
-      {loading ? (
-        <Loading>
-          <ha-circular-progress indeterminate />
-        </Loading>
-      ) : mode === 'display' ? (
-        <DisplayMode
-          todoItems={todoItems}
-          chores={chores}
-          config={config}
-        />
-      ) : (
-        <ManageMode
-          chores={chores}
-          todoItems={todoItems}
-          config={config}
-          onEditChore={handleEditChore}
-        />
-      )}
+      <ContentArea>
+        {loading ? (
+          <Loading>
+            <ha-circular-progress indeterminate />
+          </Loading>
+        ) : mode === 'display' ? (
+          <DisplayMode
+            todoItems={todoItems}
+            chores={chores}
+            config={config}
+          />
+        ) : (
+          <ManageMode
+            chores={chores}
+            todoItems={todoItems}
+            config={config}
+            onEditChore={handleEditChore}
+          />
+        )}
+      </ContentArea>
 
       {showEditor && (
         <ChoreEditorModal
@@ -104,11 +106,26 @@ const ChoreSchedulerApp = () => {
 export default ChoreSchedulerApp
 
 const CardContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   padding: 16px;
+`
+
+const ContentArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 `
 
 const Loading = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
+  flex: 1;
   padding: 32px;
 `
