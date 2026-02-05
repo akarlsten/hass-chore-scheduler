@@ -25,20 +25,31 @@ class ChoreSchedulerCardElement extends HTMLElement {
       default_mode: (config.default_mode as CardMode | undefined) ?? 'display',
       show_completed: (config.show_completed as boolean | undefined) ?? false,
       enable_animations: (config.enable_animations as boolean | undefined) ?? true,
+      expand_to_viewport: (config.expand_to_viewport as boolean | undefined) ?? false,
     }
+    this._applyStyles()
     this._render()
   }
 
   connectedCallback() {
-    // Make the element fill available viewport height
-    this.style.display = 'flex'
-    this.style.flexDirection = 'column'
-    this.style.minHeight = 'calc(100vh - 90px)'
-
     // When HA re-attaches the element (e.g. tab switch), the styled-components
     // CSSStyleSheet is invalidated. Force a clean re-render.
     this._teardown()
+    this._applyStyles()
     this._render()
+  }
+
+  private _applyStyles() {
+    if (this._config?.expand_to_viewport) {
+      // Make the element fill available viewport height
+      this.style.display = 'flex'
+      this.style.flexDirection = 'column'
+      this.style.minHeight = 'calc(100vh - 90px)'
+    } else {
+      this.style.display = ''
+      this.style.flexDirection = ''
+      this.style.minHeight = ''
+    }
   }
 
   disconnectedCallback() {
@@ -61,6 +72,7 @@ class ChoreSchedulerCardElement extends HTMLElement {
       default_mode: 'display',
       show_completed: false,
       enable_animations: true,
+      expand_to_viewport: false,
     }
   }
 
@@ -75,12 +87,19 @@ class ChoreSchedulerCardElement extends HTMLElement {
   private _ensureCard() {
     if (!this._card) {
       this._card = document.createElement('ha-card')
-      // Make ha-card fill height and use flexbox
+      this.appendChild(this._card)
+    }
+    // Apply flex styles based on config
+    if (this._config?.expand_to_viewport) {
       this._card.style.display = 'flex'
       this._card.style.flexDirection = 'column'
       this._card.style.flex = '1'
       this._card.style.minHeight = '0'
-      this.appendChild(this._card)
+    } else {
+      this._card.style.display = ''
+      this._card.style.flexDirection = ''
+      this._card.style.flex = ''
+      this._card.style.minHeight = ''
     }
     return this._card
   }

@@ -44,6 +44,7 @@ export interface ChoreSchedulerCardConfig extends LovelaceCardConfig {
   default_mode?: CardMode
   show_completed?: boolean
   enable_animations?: boolean
+  expand_to_viewport?: boolean
 }
 
 export type ScheduleType = "once" | "daily" | "weekly" | "monthly" | "custom"

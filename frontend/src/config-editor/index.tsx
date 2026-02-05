@@ -63,6 +63,14 @@ const CardEditor = ({ hass, config, onConfigChanged }: CardEditorProps) => {
             onChange={(checked) => update({ enable_animations: checked })}
           />
         </SwitchRow>
+
+        <SwitchRow>
+          <SwitchLabel>Expand to fill viewport</SwitchLabel>
+          <HaSwitch
+            checked={config.expand_to_viewport === true}
+            onChange={(checked) => update({ expand_to_viewport: checked })}
+          />
+        </SwitchRow>
       </Switches>
     </EditorRoot>
   );
