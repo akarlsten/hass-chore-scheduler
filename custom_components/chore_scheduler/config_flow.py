@@ -30,6 +30,12 @@ from .const import (
     DEFAULT_TTS_SERVICE,
     DEFAULT_TTS_LANGUAGE,
     TTS_SERVICES,
+    CONF_CAST_ENABLED,
+    CONF_CAST_TARGET,
+    CONF_CAST_DASHBOARD,
+    CONF_CAST_VIEW,
+    CONF_CAST_DURATION,
+    DEFAULT_CAST_DURATION,
 )
 from .tts_messages import SUPPORTED_LANGUAGES
 
@@ -153,6 +159,37 @@ class ChoreSchedulerOptionsFlow(OptionsFlow):
                             step=1,
                             mode=selector.NumberSelectorMode.BOX,
                             unit_of_measurement="hours",
+                        )
+                    ),
+                    # Cast settings
+                    vol.Optional(
+                        CONF_CAST_ENABLED,
+                        default=options.get(CONF_CAST_ENABLED, False),
+                    ): bool,
+                    vol.Optional(
+                        CONF_CAST_TARGET,
+                        default=options.get(CONF_CAST_TARGET, ""),
+                    ): selector.EntitySelector(
+                        selector.EntitySelectorConfig(domain="media_player")
+                    ),
+                    vol.Optional(
+                        CONF_CAST_DASHBOARD,
+                        default=options.get(CONF_CAST_DASHBOARD, ""),
+                    ): str,
+                    vol.Optional(
+                        CONF_CAST_VIEW,
+                        default=options.get(CONF_CAST_VIEW, ""),
+                    ): str,
+                    vol.Optional(
+                        CONF_CAST_DURATION,
+                        default=options.get(CONF_CAST_DURATION, DEFAULT_CAST_DURATION),
+                    ): selector.NumberSelector(
+                        selector.NumberSelectorConfig(
+                            min=1,
+                            max=480,
+                            step=1,
+                            mode=selector.NumberSelectorMode.BOX,
+                            unit_of_measurement="minutes",
                         )
                     ),
                 }

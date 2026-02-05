@@ -12,6 +12,12 @@ import {
 
 const DOMAIN = 'chore_scheduler'
 
+// Subscription message type
+interface SubscriptionMessage {
+  chores: Chore[]
+  items: TodoItem[]
+}
+
 export interface ChoreSchedulerStore {
   // State from HTMLElement shell
   hass?: HomeAssistant
@@ -26,21 +32,23 @@ export interface ChoreSchedulerStore {
   // Track items being completed (for optimistic UI)
   completingItems: Record<string, boolean>
 
+  // Subscription state (internal)
+  _unsubscribe: (() => void) | null
+
   // Setters
   setHass: (hass: HomeAssistant) => void
   setConfig: (config: ChoreSchedulerCardConfig) => void
   setMode: (mode: CardMode) => void
 
   // Actions
+  subscribe: () => void
+  unsubscribe: () => void
   loadData: () => Promise<void>
   completeItem: (uid: string) => Promise<void>
   triggerChore: (choreId: string) => Promise<void>
   saveChore: (chore: Partial<Chore>, isNew: boolean) => Promise<void>
   deleteChore: (choreId: string) => Promise<void>
 }
-
-// Debounce timer for loadData after completions
-let reloadTimer: ReturnType<typeof setTimeout> | null = null
 
 const createStore = () =>
   create<ChoreSchedulerStore>((set, get) => ({
@@ -51,10 +59,45 @@ const createStore = () =>
     loading: true,
     mode: 'display',
     completingItems: {},
+    _unsubscribe: null,
 
     setHass: (hass) => set({ hass }),
     setConfig: (config) => set({ config, mode: config.default_mode || 'display' }),
     setMode: (mode) => set({ mode }),
+
+    subscribe: () => {
+      const { hass, _unsubscribe: existing } = get()
+      if (!hass) return
+      if (existing) existing() // Clean up existing subscription
+
+      set({ loading: true })
+
+      const unsub = hass.connection.subscribeMessage<SubscriptionMessage>(
+        (message) => {
+          const { completingItems } = get()
+          // Merge with optimistic completing state
+          const items = (message.items ?? []).map((item) =>
+            completingItems[item.uid] ? { ...item, status: 'completed' as const } : item
+          )
+          set({
+            chores: message.chores ?? [],
+            todoItems: items,
+            loading: false,
+          })
+        },
+        { type: `${DOMAIN}/subscribe` }
+      )
+
+      set({ _unsubscribe: unsub })
+    },
+
+    unsubscribe: () => {
+      const { _unsubscribe } = get()
+      if (_unsubscribe) {
+        _unsubscribe()
+        set({ _unsubscribe: null })
+      }
+    },
 
     loadData: async () => {
       const { hass, completingItems } = get()
@@ -85,7 +128,7 @@ const createStore = () =>
     },
 
     completeItem: async (uid) => {
-      const { hass, todoItems, completingItems, loadData } = get()
+      const { hass, todoItems, completingItems } = get()
       if (!hass) return
       if (completingItems[uid]) return // Already completing
 
@@ -104,42 +147,35 @@ const createStore = () =>
         type: `${DOMAIN}/complete_todo`,
         uid,
       }).then(() => {
-        // After animation completes (~800ms), remove from completing set and reload
+        // After animation completes (~800ms), remove from completing set
+        // Subscription will push the real update
         setTimeout(() => {
-          const { completingItems: current, loadData: reload } = get()
+          const { completingItems: current } = get()
           const { [uid]: _, ...rest } = current
           set({ completingItems: rest })
-
-          // Debounce reload - wait for rapid completions to settle
-          if (reloadTimer) clearTimeout(reloadTimer)
-          reloadTimer = setTimeout(() => {
-            reloadTimer = null
-            reload()
-          }, 500)
         }, 800)
       }).catch((err) => {
         console.error('[ChoreScheduler] Failed to complete todo:', err)
         // Revert optimistic update on error
-        const { completingItems: current, loadData: reload } = get()
+        const { completingItems: current } = get()
         const { [uid]: _, ...rest } = current
         set({ completingItems: rest })
-        reload()
       })
     },
 
     triggerChore: async (choreId) => {
-      const { hass, loadData } = get()
+      const { hass } = get()
       if (!hass) return
       try {
         await hass.callService(DOMAIN, 'trigger_chore', { chore_id: choreId })
-        setTimeout(() => loadData(), 500)
+        // Subscription will push update when coordinator refreshes
       } catch (err) {
         console.error('[ChoreScheduler] Error triggering chore:', err)
       }
     },
 
     saveChore: async (chore, isNew) => {
-      const { hass, loadData } = get()
+      const { hass } = get()
       if (!hass) return
       if (isNew) {
         await hass.callService(DOMAIN, 'add_chore', chore)
@@ -149,14 +185,14 @@ const createStore = () =>
           ...chore,
         })
       }
-      await loadData()
+      // Subscription will push update when coordinator refreshes
     },
 
     deleteChore: async (choreId) => {
-      const { hass, loadData } = get()
+      const { hass } = get()
       if (!hass) return
       await hass.callService(DOMAIN, 'delete_chore', { chore_id: choreId })
-      setTimeout(() => loadData(), 500)
+      // Subscription will push update when coordinator refreshes
     },
   }))
 

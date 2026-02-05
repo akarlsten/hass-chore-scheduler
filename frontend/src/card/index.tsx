@@ -12,7 +12,8 @@ const StoreWrapper = ({ hass, config }: StoreProps) => {
   const store = useStore()
   const setHass = store((s) => s.setHass)
   const setConfig = store((s) => s.setConfig)
-  const loadData = store((s) => s.loadData)
+  const subscribe = store((s) => s.subscribe)
+  const unsubscribe = store((s) => s.unsubscribe)
   const hasHass = store((s) => !!s.hass)
 
   useEffect(() => {
@@ -24,7 +25,10 @@ const StoreWrapper = ({ hass, config }: StoreProps) => {
   }, [config])
 
   useEffect(() => {
-    if (hasHass) loadData()
+    if (hasHass) {
+      subscribe()
+      return () => unsubscribe()
+    }
   }, [hasHass])
 
   return <ChoreSchedulerApp />

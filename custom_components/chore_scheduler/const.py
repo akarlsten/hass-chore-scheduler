@@ -84,3 +84,11 @@ TTS_SERVICES: Final = [
     "cloud_say",
     "speak",
 ]
+
+# Cast configuration keys
+CONF_CAST_ENABLED: Final = "cast_enabled"
+CONF_CAST_TARGET: Final = "cast_target"
+CONF_CAST_DASHBOARD: Final = "cast_dashboard"
+CONF_CAST_VIEW: Final = "cast_view"
+CONF_CAST_DURATION: Final = "cast_duration"
+DEFAULT_CAST_DURATION: Final = 60

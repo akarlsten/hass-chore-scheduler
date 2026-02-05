@@ -56,32 +56,48 @@ def ws_subscribe_chores(
     connection: websocket_api.ActiveConnection,
     msg: dict,
 ) -> None:
-    """Subscribe to chore updates."""
+    """Subscribe to chore and todo updates."""
     store = _get_store(hass)
     if store is None:
         connection.send_error(msg["id"], "not_found", "Chore Scheduler not configured")
         return
 
     @callback
-    def forward_chores() -> None:
-        """Forward chore updates to the client."""
+    def forward_data() -> None:
+        """Forward all data to the client."""
+        chores = store.get_chores()
+        chores_by_id = {c["id"]: c for c in chores}
+
+        # Enrich todos (same logic as ws_list_todos)
+        todo_items = store.get_todo_items()
+        enriched_todos = []
+        for item in todo_items:
+            chore = chores_by_id.get(item.get("chore_id", ""))
+            enriched_todos.append({
+                **item,
+                "chore_name": chore["name"] if chore else None,
+                "schedule_type": chore.get("schedule", {}).get("type") if chore else None,
+                "assignment": chore.get("assignment") if chore else None,
+                "completion_stats": store.get_completion_stats(chore["id"]) if chore else None,
+            })
+
         connection.send_message(
             websocket_api.event_message(
                 msg["id"],
-                {"chores": store.get_chores()},
+                {"chores": chores, "items": enriched_todos},
             )
         )
 
     # Send initial data
     connection.send_result(msg["id"])
-    forward_chores()
+    forward_data()
 
     # Subscribe to coordinator updates
     for entry_data in hass.data.get(DOMAIN, {}).values():
         coordinator = entry_data.get("coordinator") if isinstance(entry_data, dict) else None
         if coordinator:
             connection.subscriptions[msg["id"]] = coordinator.async_add_listener(
-                forward_chores
+                forward_data
             )
             break
 

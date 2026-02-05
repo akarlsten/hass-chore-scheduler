@@ -1,13 +1,15 @@
 """Coordinator for the Chore Scheduler integration."""
 from __future__ import annotations
 
+import asyncio
 import calendar
 from datetime import datetime, timedelta
 import logging
-from typing import Any
+from typing import Any, Callable
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
 
@@ -29,6 +31,12 @@ from .const import (
     DEFAULT_QUIET_HOURS_END,
     DEFAULT_REMINDER_DELAY_HOURS,
     DEFAULT_TTS_SERVICE,
+    CONF_CAST_ENABLED,
+    CONF_CAST_TARGET,
+    CONF_CAST_DASHBOARD,
+    CONF_CAST_VIEW,
+    CONF_CAST_DURATION,
+    DEFAULT_CAST_DURATION,
 )
 from .store import ChoreStore
 from .tts_messages import get_tts_message
@@ -57,6 +65,7 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
         self.store = store
         self.entry = entry
+        self._cast_timer_cancel: Callable[[], None] | None = None
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Check for due chores and create todos."""
@@ -311,6 +320,9 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         # Send TTS announcement
         await self._send_tts_for_chore(chore, assignee, is_reminder=False)
+
+        # Cast dashboard to display
+        await self._cast_dashboard_for_chore(chore)
 
         # Create todo item in our own todo list (dedup check)
         if not self.store.todo_item_exists_for_chore(chore["id"]):
@@ -659,3 +671,91 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
                 # Mark reminder as sent to avoid repeating
                 await self.store.async_mark_reminder_sent(item["uid"])
+
+    # ── Cast Methods ───────────────────────────────────────────────
+
+    async def _cast_dashboard_for_chore(self, chore: dict[str, Any]) -> None:
+        """Cast dashboard to display when chore triggers."""
+        if self._is_quiet_hours():
+            _LOGGER.debug("Skipping cast - quiet hours active")
+            return
+
+        options = self.entry.options
+        cast_enabled = options.get(CONF_CAST_ENABLED, False)
+        cast_target = options.get(CONF_CAST_TARGET)
+        cast_dashboard = options.get(CONF_CAST_DASHBOARD)
+        cast_duration = options.get(CONF_CAST_DURATION, DEFAULT_CAST_DURATION)
+
+        if not cast_enabled or not cast_target or not cast_dashboard:
+            _LOGGER.debug(
+                "Skipping cast for chore '%s' - cast disabled or not configured",
+                chore.get("name", "?"),
+            )
+            return
+
+        # Check if cast target overlaps with TTS targets - add delay for TTS to finish
+        tts_targets = options.get(CONF_TTS_TARGETS, [])
+        if cast_target in tts_targets:
+            _LOGGER.debug(
+                "Cast target %s is also a TTS target, waiting 10s for TTS to complete",
+                cast_target,
+            )
+            await asyncio.sleep(10)
+
+        # Cancel any existing cast timer
+        if self._cast_timer_cancel:
+            self._cast_timer_cancel()
+            self._cast_timer_cancel = None
+
+        # Cast the dashboard
+        try:
+            service_data: dict[str, Any] = {
+                "entity_id": cast_target,
+                "dashboard_path": cast_dashboard,
+            }
+            cast_view = options.get(CONF_CAST_VIEW)
+            if cast_view:
+                service_data["view_path"] = cast_view
+
+            await self.hass.services.async_call(
+                "cast", "show_lovelace_view", service_data, blocking=True
+            )
+            _LOGGER.info(
+                "Cast dashboard '%s' to %s for chore '%s'",
+                cast_dashboard,
+                cast_target,
+                chore.get("name", "?"),
+            )
+        except Exception as err:
+            _LOGGER.warning(
+                "Failed to cast dashboard for chore '%s': %s",
+                chore.get("name", "?"),
+                err,
+            )
+            return
+
+        # Schedule timer to stop casting
+        stop_time = dt_util.utcnow() + timedelta(minutes=cast_duration)
+        self._cast_timer_cancel = async_track_point_in_time(
+            self.hass, self._async_stop_cast, stop_time
+        )
+        _LOGGER.debug(
+            "Scheduled cast stop for %s in %d minutes", cast_target, cast_duration
+        )
+
+    async def _async_stop_cast(self, now: datetime) -> None:
+        """Stop casting after timeout."""
+        self._cast_timer_cancel = None
+        cast_target = self.entry.options.get(CONF_CAST_TARGET)
+        if not cast_target:
+            return
+
+        try:
+            await self.hass.services.async_call(
+                "media_player", "turn_off", {"entity_id": cast_target}, blocking=True
+            )
+            _LOGGER.info("Stopped casting to %s", cast_target)
+        except Exception as err:
+            _LOGGER.debug(
+                "Could not stop cast to %s (may already be off): %s", cast_target, err
+            )
