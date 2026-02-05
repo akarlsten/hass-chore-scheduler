@@ -16,19 +16,28 @@
         "title": "Sysslor inst\u00e4llningar",
         "data": {
           "tts_enabled": "Aktivera TTS-meddelanden",
-          "tts_targets": "TTS-h\u00f6gtalare",
-          "tts_service": "TTS-tj\u00e4nst",
-          "tts_language": "TTS-spr\u00e5k",
-          "quiet_hours_start": "Tysta timmar b\u00f6rjar",
+          "tts_targets": "TTS-högtalare",
+          "tts_service": "TTS-tjänst",
+          "tts_language": "TTS-språk",
+          "quiet_hours_start": "Tysta timmar börjar",
           "quiet_hours_end": "Tysta timmar slutar",
-          "reminder_delay_hours": "P\u00e5minnelsef\u00f6rsening (timmar)"
+          "reminder_delay_hours": "Påminnelsefördröjning (timmar)",
+          "cast_enabled": "Aktivera dashboard-casting",
+          "cast_target": "Cast-skärm",
+          "cast_dashboard": "Dashboard att casta",
+          "cast_view": "Vy att casta (valfritt)",
+          "cast_duration": "Cast-varaktighet (minuter)"
         },
         "data_description": {
-          "tts_targets": "Mediaspelare att meddela sysslor p\u00e5",
-          "tts_service": "Text-till-tal-tj\u00e4nst att anv\u00e4nda",
+          "tts_targets": "Mediaspelare att meddela sysslor på",
+          "tts_service": "Text-till-tal-tjänst att använda",
           "quiet_hours_start": "Inga TTS-meddelanden efter denna tid",
-          "quiet_hours_end": "Inga TTS-meddelanden f\u00f6re denna tid",
-          "reminder_delay_hours": "Skicka p\u00e5minnelse om sysslan inte \u00e4r klar inom s\u00e5 m\u00e5nga timmar"
+          "quiet_hours_end": "Inga TTS-meddelanden före denna tid",
+          "reminder_delay_hours": "Skicka påminnelse om sysslan inte är klar inom så många timmar",
+          "cast_target": "Mediaspelare att casta dashboard till när sysslor utlöses",
+          "cast_dashboard": "Dashboard-sökväg (t.ex. 'lovelace' eller 'lovelace-chores')",
+          "cast_view": "Specifik vy-sökväg (lämna tomt för standard)",
+          "cast_duration": "Hur länge skärmen visas innan den stängs av"
         }
       }
     }
