@@ -1,6 +1,7 @@
 import { CardMode, ChoreSchedulerCardConfig, HomeAssistant, LovelaceCardConfig } from '@types'
 import { render } from 'preact'
 import { StyleSheetManager } from 'styled-components'
+import { createChoreSchedulerStore, StoreInstance } from '@store'
 import StoreProviderWrapper from './card'
 import CardEditor from './config-editor'
 
@@ -10,6 +11,7 @@ class ChoreSchedulerCardElement extends HTMLElement {
   private _hass: HomeAssistant | undefined
   private _config: ChoreSchedulerCardConfig | undefined
   private _card: HTMLElement | undefined
+  private _store: StoreInstance = createChoreSchedulerStore()
 
   set hass(hass: HomeAssistant) {
     this._hass = hass
@@ -109,7 +111,7 @@ class ChoreSchedulerCardElement extends HTMLElement {
     const card = this._ensureCard()
     render(
       <StyleSheetManager target={this}>
-        <StoreProviderWrapper hass={this._hass} config={this._config} />
+        <StoreProviderWrapper hass={this._hass} config={this._config} store={this._store} />
       </StyleSheetManager>,
       card
     )

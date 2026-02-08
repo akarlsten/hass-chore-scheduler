@@ -1,7 +1,8 @@
 import { useStore } from '@store'
 
 const useCompletingItems = () => {
-  return useStore((state) => state.completingItems)
+  const store = useStore()
+  return store((state) => state.completingItems)
 }
 
 export default useCompletingItems

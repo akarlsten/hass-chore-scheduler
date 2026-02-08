@@ -66,6 +66,7 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self.store = store
         self.entry = entry
         self._cast_timer_cancel: Callable[[], None] | None = None
+        self._notification_lock = asyncio.Lock()
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Check for due chores and create todos."""
@@ -80,33 +81,34 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         next_chore = None
         next_chore_time = None
 
-        for chore in chores:
-            if not chore.get("enabled", True):
-                continue
+        async with self.store.batch():
+            for chore in chores:
+                if not chore.get("enabled", True):
+                    continue
 
-            try:
-                is_due, scheduled_time = self._check_if_due(chore, now)
+                try:
+                    is_due, scheduled_time = self._check_if_due(chore, now)
 
-                if is_due:
-                    due_chores.append(chore)
-                    _LOGGER.info(
-                        "Chore '%s' is due, triggering", chore["name"]
+                    if is_due:
+                        due_chores.append(chore)
+                        _LOGGER.info(
+                            "Chore '%s' is due, triggering", chore["name"]
+                        )
+                        await self.async_trigger_chore(chore)
+
+                    # Track next upcoming chore
+                    if scheduled_time and scheduled_time > now:
+                        if next_chore_time is None or scheduled_time < next_chore_time:
+                            next_chore = chore
+                            next_chore_time = scheduled_time
+
+                except Exception:
+                    _LOGGER.exception(
+                        "Error processing chore '%s'", chore.get("name", "?")
                     )
-                    await self.async_trigger_chore(chore)
 
-                # Track next upcoming chore
-                if scheduled_time and scheduled_time > now:
-                    if next_chore_time is None or scheduled_time < next_chore_time:
-                        next_chore = chore
-                        next_chore_time = scheduled_time
-
-            except Exception:
-                _LOGGER.exception(
-                    "Error processing chore '%s'", chore.get("name", "?")
-                )
-
-        # Check for overdue todo items needing TTS reminders
-        await self._check_reminders()
+            # Check for overdue todo items needing TTS reminders
+            await self._check_reminders()
 
         return {
             "chores": chores,
@@ -297,9 +299,21 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
 
     async def async_trigger_chore(self, chore: dict[str, Any]) -> None:
-        """Trigger a chore - create todo and send notification."""
+        """Trigger a chore - create todo immediately, deliver notifications in background."""
         _LOGGER.info("Triggering chore: %s", chore["name"])
 
+        # Fast path: create todo + update state
+        assignee = await self._create_todo_for_chore(chore)
+
+        # Schedule notifications in background (sequential, under lock)
+        self.hass.async_create_task(
+            self._deliver_chore_notifications(chore, assignee)
+        )
+
+    async def _create_todo_for_chore(
+        self, chore: dict[str, Any]
+    ) -> str | None:
+        """Create a todo item for a triggered chore and update state (fast path)."""
         # Get current assignee if rotating
         assignee = None
         assignment = chore.get("assignment", {})
@@ -315,15 +329,6 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             assignee_name = assignee.split(".")[-1].replace("_", " ").title()
             summary = f"{chore['name']} ({assignee_name})"
 
-        # Send notification (independent of todo creation)
-        await self._send_notification(chore, assignee)
-
-        # Send TTS announcement
-        await self._send_tts_for_chore(chore, assignee, is_reminder=False)
-
-        # Cast dashboard to display
-        await self._cast_dashboard_for_chore(chore)
-
         # Create todo item in our own todo list (dedup check)
         if not self.store.todo_item_exists_for_chore(chore["id"]):
             await self.store.async_add_todo_item(
@@ -332,8 +337,6 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 description=chore.get("description"),
             )
             _LOGGER.info("Created todo: %s", summary)
-
-            # Notify the todo entity to update HA state
             self._notify_todo_entity()
         else:
             _LOGGER.debug(
@@ -350,6 +353,23 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         if schedule.get("type") == SCHEDULE_ONCE:
             await self.store.async_update_chore(chore["id"], enabled=False)
             _LOGGER.info("Auto-disabled one-time chore: %s", chore["name"])
+
+        return assignee
+
+    async def _deliver_chore_notifications(
+        self, chore: dict[str, Any], assignee: str | None
+    ) -> None:
+        """Deliver all notifications for a triggered chore (background, under lock)."""
+        async with self._notification_lock:
+            try:
+                await self._send_notification(chore, assignee)
+                await self._send_tts_for_chore(chore, assignee, is_reminder=False)
+                await self._cast_dashboard_for_chore(chore)
+            except Exception:
+                _LOGGER.exception(
+                    "Error delivering notifications for chore '%s'",
+                    chore.get("name", "?"),
+                )
 
     def _notify_todo_entity(self) -> None:
         """Notify the todo entity to update its HA state."""
@@ -633,7 +653,11 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         return None
 
     async def _check_reminders(self) -> None:
-        """Check for incomplete todo items that need a TTS reminder."""
+        """Check for incomplete todo items that need a TTS reminder.
+
+        Marks reminders as sent immediately (batched with other writes),
+        then schedules TTS delivery in the background under the notification lock.
+        """
         if not self._get_tts_targets():
             return
 
@@ -642,6 +666,8 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         global_delay = options.get(
             CONF_REMINDER_DELAY_HOURS, DEFAULT_REMINDER_DELAY_HOURS
         )
+
+        reminder_queue: list[tuple[dict[str, Any], str | None]] = []
 
         for item in self.store.get_todo_items():
             if item["status"] == "completed":
@@ -665,12 +691,31 @@ class ChoreSchedulerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             threshold = created_at + timedelta(hours=global_delay)
             if now >= threshold:
                 assignee = self._get_current_assignee(chore)
-                await self._send_tts_for_chore(
-                    chore, assignee, is_reminder=True
-                )
-
-                # Mark reminder as sent to avoid repeating
+                reminder_queue.append((chore, assignee))
+                # Mark sent immediately (deferred if inside batch)
                 await self.store.async_mark_reminder_sent(item["uid"])
+
+        if reminder_queue:
+            self.hass.async_create_task(
+                self._deliver_reminder_notifications(reminder_queue)
+            )
+
+    async def _deliver_reminder_notifications(
+        self,
+        reminder_queue: list[tuple[dict[str, Any], str | None]],
+    ) -> None:
+        """Deliver reminder TTS notifications (background, under lock)."""
+        async with self._notification_lock:
+            for chore, assignee in reminder_queue:
+                try:
+                    await self._send_tts_for_chore(
+                        chore, assignee, is_reminder=True
+                    )
+                except Exception:
+                    _LOGGER.exception(
+                        "Error delivering reminder for chore '%s'",
+                        chore.get("name", "?"),
+                    )
 
     # ── Cast Methods ───────────────────────────────────────────────
 

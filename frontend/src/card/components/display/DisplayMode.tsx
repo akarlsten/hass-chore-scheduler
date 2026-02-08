@@ -1,3 +1,4 @@
+import { useMemo } from 'preact/hooks'
 import styled from 'styled-components'
 import { TodoItem, Chore, ChoreSchedulerCardConfig } from '@types'
 import { useLocalize } from '@hooks'
@@ -13,6 +14,7 @@ interface DisplayModeProps {
 
 const DisplayMode = ({ todoItems, chores, config }: DisplayModeProps) => {
   const t = useLocalize()
+  const choresById = useMemo(() => new Map(chores.map((c) => [c.id, c])), [chores])
 
   const pending = todoItems.filter((i) => i.status === 'needs_action')
   const completed = todoItems
@@ -35,7 +37,7 @@ const DisplayMode = ({ todoItems, chores, config }: DisplayModeProps) => {
         <AllDoneState />
         <Spacer />
         {config.show_completed && (
-          <TodoSection title={t('display.done')} items={completed} chores={chores} sectionClass="completed" />
+          <TodoSection title={t('display.done')} items={completed} choresById={choresById} sectionClass="completed" />
         )}
       </Container>
     )
@@ -45,19 +47,19 @@ const DisplayMode = ({ todoItems, chores, config }: DisplayModeProps) => {
     <Container>
       <PendingSections>
         {overdue.length > 0 && (
-          <TodoSection title={t('display.overdue')} items={overdue} chores={chores} sectionClass="overdue" />
+          <TodoSection title={t('display.overdue')} items={overdue} choresById={choresById} sectionClass="overdue" />
         )}
         {todayItems.length > 0 && (
-          <TodoSection title={t('display.today')} items={todayItems} chores={chores} sectionClass="today" />
+          <TodoSection title={t('display.today')} items={todayItems} choresById={choresById} sectionClass="today" />
         )}
         {upcoming.length > 0 && (
-          <TodoSection title={t('display.upcoming')} items={upcoming} chores={chores} sectionClass="upcoming" />
+          <TodoSection title={t('display.upcoming')} items={upcoming} choresById={choresById} sectionClass="upcoming" />
         )}
       </PendingSections>
       {config.show_completed && completed.length > 0 && (
         <>
           <Spacer />
-          <TodoSection title={t('display.done')} items={completed} chores={chores} sectionClass="completed" />
+          <TodoSection title={t('display.done')} items={completed} choresById={choresById} sectionClass="completed" />
         </>
       )}
     </Container>

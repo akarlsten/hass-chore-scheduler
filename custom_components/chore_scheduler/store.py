@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 import uuid
+from contextlib import asynccontextmanager
 from datetime import date, datetime
-from typing import Any
+from typing import Any, AsyncIterator
 
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.storage import Store
@@ -29,6 +30,26 @@ class ChoreStore:
         self._chores: dict[str, dict[str, Any]] = {}
         self._todo_items: dict[str, dict[str, Any]] = {}
         self._completion_history: dict[str, dict[str, Any]] = {}
+        self._version: int = 0
+        self._batch_depth: int = 0
+        self._save_pending: bool = False
+
+    @property
+    def version(self) -> int:
+        """Return the data version counter (increments on every save)."""
+        return self._version
+
+    @asynccontextmanager
+    async def batch(self) -> AsyncIterator[None]:
+        """Batch multiple mutations into a single disk write."""
+        self._batch_depth += 1
+        try:
+            yield
+        finally:
+            self._batch_depth -= 1
+            if self._batch_depth == 0 and self._save_pending:
+                self._save_pending = False
+                await self.async_save()
 
     async def async_load(self) -> None:
         """Load data from storage."""
@@ -45,11 +66,19 @@ class ChoreStore:
 
     async def async_save(self) -> None:
         """Save all data to storage."""
+        self._version += 1
         await self._store.async_save({
             "chores": self._chores,
             "todo_items": list(self._todo_items.values()),
             "completion_history": self._completion_history,
         })
+
+    async def _request_save(self) -> None:
+        """Save immediately or defer if inside a batch."""
+        if self._batch_depth > 0:
+            self._save_pending = True
+        else:
+            await self.async_save()
 
     @callback
     def get_chores(self) -> list[dict[str, Any]]:
@@ -110,7 +139,7 @@ class ChoreStore:
         }
 
         self._chores[chore_id] = chore
-        await self.async_save()
+        await self._request_save()
         return chore
 
     async def async_update_chore(
@@ -125,7 +154,7 @@ class ChoreStore:
             if key in chore and value is not None:
                 chore[key] = value
 
-        await self.async_save()
+        await self._request_save()
         return chore
 
     async def async_delete_chore(self, chore_id: str) -> bool:
@@ -134,7 +163,7 @@ class ChoreStore:
             return False
 
         del self._chores[chore_id]
-        await self.async_save()
+        await self._request_save()
         return True
 
     async def async_set_last_triggered(
@@ -143,7 +172,7 @@ class ChoreStore:
         """Update the last triggered timestamp for a chore."""
         if chore_id in self._chores:
             self._chores[chore_id]["last_triggered"] = timestamp
-            await self.async_save()
+            await self._request_save()
 
     async def async_rotate_assignment(self, chore_id: str) -> str | None:
         """Rotate to the next assignee and return the current one."""
@@ -165,7 +194,7 @@ class ChoreStore:
 
         # Rotate to next
         assignment["current_index"] = (current_index + 1) % len(assignees)
-        await self.async_save()
+        await self._request_save()
 
         return current_assignee
 
@@ -210,7 +239,7 @@ class ChoreStore:
             "reminder_sent": False,
         }
         self._todo_items[uid] = item
-        await self.async_save()
+        await self._request_save()
         return item
 
     async def async_update_todo_item(
@@ -229,20 +258,20 @@ class ChoreStore:
         if kwargs.get("status") == "completed" and item.get("completed_at") is None:
             item["completed_at"] = dt_util.now().isoformat()
 
-        await self.async_save()
+        await self._request_save()
         return item
 
     async def async_mark_reminder_sent(self, uid: str) -> None:
         """Mark a todo item's reminder as sent."""
         if uid in self._todo_items:
             self._todo_items[uid]["reminder_sent"] = True
-            await self.async_save()
+            await self._request_save()
 
     async def async_delete_todo_items(self, uids: list[str]) -> None:
         """Delete todo items by UIDs."""
         for uid in uids:
             self._todo_items.pop(uid, None)
-        await self.async_save()
+        await self._request_save()
 
     # ── Completion history methods ─────────────────────────────────────
 
@@ -285,5 +314,5 @@ class ChoreStore:
         stats["total_completions"] = stats.get("total_completions", 0) + 1
 
         self._completion_history[chore_id] = stats
-        await self.async_save()
+        await self._request_save()
         return stats

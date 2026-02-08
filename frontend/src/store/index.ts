@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import createStoreContext from '@store/createStoreContext'
+import { createContext, h, ComponentChildren } from 'preact'
+import { useContext } from 'preact/hooks'
 import {
   HomeAssistant,
   ChoreSchedulerCardConfig,
@@ -34,6 +35,7 @@ export interface ChoreSchedulerStore {
 
   // Subscription state (internal)
   _unsubscribe: (() => void) | null
+  _subscriptionId: number
 
   // Setters
   setHass: (hass: HomeAssistant) => void
@@ -50,7 +52,7 @@ export interface ChoreSchedulerStore {
   deleteChore: (choreId: string) => Promise<void>
 }
 
-const createStore = () =>
+export const createChoreSchedulerStore = () =>
   create<ChoreSchedulerStore>((set, get) => ({
     hass: undefined,
     config: undefined,
@@ -60,20 +62,40 @@ const createStore = () =>
     mode: 'display',
     completingItems: {},
     _unsubscribe: null,
+    _subscriptionId: 0,
 
-    setHass: (hass) => set({ hass }),
+    setHass: (hass) => {
+      const prev = get().hass
+      set({ hass })
+      // Auto-subscribe when connection first becomes available or changes
+      if (hass && (!prev || prev.connection !== hass.connection)) {
+        get().subscribe()
+      }
+    },
+
     setConfig: (config) => set({ config, mode: config.default_mode || 'display' }),
     setMode: (mode) => set({ mode }),
 
     subscribe: () => {
       const { hass, _unsubscribe: existing } = get()
       if (!hass) return
-      if (existing) existing() // Clean up existing subscription
+      if (existing) existing()
 
-      set({ loading: true })
+      // Only show loading spinner if we have no data yet
+      const hasData = get().chores.length > 0 || get().todoItems.length > 0
+      if (!hasData) {
+        set({ loading: true })
+      }
 
-      const unsub = hass.connection.subscribeMessage<SubscriptionMessage>(
+      // Generation counter to handle async race conditions
+      const id = get()._subscriptionId + 1
+      set({ _unsubscribe: null, _subscriptionId: id })
+
+      hass.connection.subscribeMessage<SubscriptionMessage>(
         (message) => {
+          // Ignore messages from stale subscriptions
+          if (get()._subscriptionId !== id) return
+
           const { completingItems } = get()
           // Merge with optimistic completing state
           const items = (message.items ?? []).map((item) =>
@@ -86,9 +108,14 @@ const createStore = () =>
           })
         },
         { type: `${DOMAIN}/subscribe` }
-      )
-
-      set({ _unsubscribe: unsub })
+      ).then((unsub) => {
+        // Only store unsub if this subscription is still current
+        if (get()._subscriptionId !== id) {
+          unsub()
+          return
+        }
+        set({ _unsubscribe: unsub })
+      })
     },
 
     unsubscribe: () => {
@@ -196,6 +223,18 @@ const createStore = () =>
     },
   }))
 
-const [StoreProvider, useStore] = createStoreContext<ChoreSchedulerStore>(createStore)
+export type StoreInstance = ReturnType<typeof createChoreSchedulerStore>
 
-export { StoreProvider, useStore }
+// ── Context / Provider / Hook ─────────────────────────────────────
+
+const StoreContext = createContext<StoreInstance | null>(null)
+
+export function StoreProvider({ store, children }: { store: StoreInstance; children: ComponentChildren }) {
+  return h(StoreContext.Provider, { value: store }, children)
+}
+
+export const useStore = (): StoreInstance => {
+  const store = useContext(StoreContext)
+  if (!store) throw new Error('useStore must be used within StoreProvider')
+  return store
+}

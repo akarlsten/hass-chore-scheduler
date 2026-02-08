@@ -62,9 +62,16 @@ def ws_subscribe_chores(
         connection.send_error(msg["id"], "not_found", "Chore Scheduler not configured")
         return
 
+    last_version: list[int | None] = [None]
+
     @callback
     def forward_data() -> None:
-        """Forward all data to the client."""
+        """Forward all data to the client (skip if store unchanged)."""
+        current_version = store.version
+        if last_version[0] is not None and last_version[0] == current_version:
+            return
+        last_version[0] = current_version
+
         chores = store.get_chores()
         chores_by_id = {c["id"]: c for c in chores}
 

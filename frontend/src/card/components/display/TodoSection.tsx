@@ -5,11 +5,11 @@ import TodoItem from './TodoItem'
 interface TodoSectionProps {
   title: string
   items: TodoItemType[]
-  chores: Chore[]
+  choresById: Map<string, Chore>
   sectionClass: string
 }
 
-const TodoSection = ({ title, items, chores, sectionClass }: TodoSectionProps) => {
+const TodoSection = ({ title, items, choresById, sectionClass }: TodoSectionProps) => {
   return (
     <Section>
       <SectionHeader $isOverdue={sectionClass === 'overdue'}>{title}</SectionHeader>
@@ -18,7 +18,7 @@ const TodoSection = ({ title, items, chores, sectionClass }: TodoSectionProps) =
           <TodoItem
             key={item.uid}
             item={item}
-            chore={chores.find((c) => c.id === item.chore_id)}
+            chore={choresById.get(item.chore_id)}
             sectionClass={sectionClass}
           />
         ))}

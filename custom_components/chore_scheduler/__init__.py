@@ -210,6 +210,7 @@ async def _async_register_services(hass: HomeAssistant) -> None:
         if chore:
             await coordinator.async_trigger_chore(chore)
             _LOGGER.info("Manually triggered chore: %s", chore["name"])
+            await coordinator.async_request_refresh()
         else:
             _LOGGER.warning("Chore not found: %s", chore_id)
 
@@ -268,7 +269,7 @@ async def _async_register_frontend(hass: HomeAssistant) -> None:
             StaticPathConfig(
                 FRONTEND_SCRIPT_PATH,
                 str(frontend_path),
-                cache_headers=False,
+                cache_headers=True,
             ),
         ]
 

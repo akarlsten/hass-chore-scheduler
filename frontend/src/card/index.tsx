@@ -1,20 +1,18 @@
 import { useEffect } from 'preact/hooks'
 import { HomeAssistant, ChoreSchedulerCardConfig } from '@types'
-import { StoreProvider, useStore } from '@store'
+import { StoreProvider, StoreInstance, useStore } from '@store'
 import ChoreSchedulerApp from '@components/ChoreSchedulerApp'
 
 interface StoreProps {
   hass: HomeAssistant
   config: ChoreSchedulerCardConfig
+  store: StoreInstance
 }
 
-const StoreWrapper = ({ hass, config }: StoreProps) => {
+const StoreWrapper = ({ hass, config }: Omit<StoreProps, 'store'>) => {
   const store = useStore()
   const setHass = store((s) => s.setHass)
   const setConfig = store((s) => s.setConfig)
-  const subscribe = store((s) => s.subscribe)
-  const unsubscribe = store((s) => s.unsubscribe)
-  const hasHass = store((s) => !!s.hass)
 
   useEffect(() => {
     setHass(hass)
@@ -24,18 +22,11 @@ const StoreWrapper = ({ hass, config }: StoreProps) => {
     setConfig(config)
   }, [config])
 
-  useEffect(() => {
-    if (hasHass) {
-      subscribe()
-      return () => unsubscribe()
-    }
-  }, [hasHass])
-
   return <ChoreSchedulerApp />
 }
 
-const StoreProviderWrapper = ({ hass, config }: StoreProps) => (
-  <StoreProvider>
+const StoreProviderWrapper = ({ hass, config, store }: StoreProps) => (
+  <StoreProvider store={store}>
     <StoreWrapper hass={hass} config={config} />
   </StoreProvider>
 )
