@@ -1,7 +1,7 @@
 import { useMemo } from 'preact/hooks'
 import styled from 'styled-components'
 import { TodoItem, Chore, ChoreSchedulerCardConfig } from '@types'
-import { useLocalize } from '@hooks'
+import { useLocalize, useCompletingItems } from '@hooks'
 import TodoSection from './TodoSection'
 import EmptyState from './EmptyState'
 import AllDoneState from './AllDoneState'
@@ -14,11 +14,13 @@ interface DisplayModeProps {
 
 const DisplayMode = ({ todoItems, chores, config }: DisplayModeProps) => {
   const t = useLocalize()
+  const completing = useCompletingItems()
   const choresById = useMemo(() => new Map(chores.map((c) => [c.id, c])), [chores])
 
-  const pending = todoItems.filter((i) => i.status === 'needs_action')
+  // Keep completing items in pending section until animation finishes
+  const pending = todoItems.filter((i) => i.status === 'needs_action' || completing[i.uid])
   const completed = todoItems
-    .filter((i) => i.status === 'completed')
+    .filter((i) => i.status === 'completed' && !completing[i.uid])
     .sort((a, b) => (b.completed_at ?? '').localeCompare(a.completed_at ?? ''))
     .slice(0, 3)
 

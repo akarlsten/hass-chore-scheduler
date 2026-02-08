@@ -29,12 +29,12 @@ const AssigneeAvatar = ({ name }: AssigneeAvatarProps) => {
 export default AssigneeAvatar
 
 const AvatarRoot = styled.div`
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
-  max-width: 24px;
-  max-height: 24px;
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  min-height: 30px;
+  max-width: 30px;
+  max-height: 30px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
@@ -42,7 +42,7 @@ const AvatarRoot = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.775rem;
+  font-size: 0.925rem;
   font-weight: 600;
   color: var(--primary-text-color);
 `

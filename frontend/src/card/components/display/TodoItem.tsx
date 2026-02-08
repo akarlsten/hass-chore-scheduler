@@ -1,5 +1,5 @@
-import { useRef } from 'preact/hooks'
-import styled, { keyframes, css } from 'styled-components'
+import { motion } from 'framer-motion'
+import styled, { css } from 'styled-components'
 import { TodoItem as TodoItemType, Chore } from '@types'
 import { useConfig, useChoreActions, useCompletingItems } from '@hooks'
 import { getChoreIcon } from '@utils/chore-icons'
@@ -15,9 +15,8 @@ interface TodoItemProps {
 
 const TodoItem = ({ item, chore, sectionClass }: TodoItemProps) => {
   const config = useConfig()
-  const { completeItem } = useChoreActions()
+  const { completeItem, uncompleteItem } = useChoreActions()
   const completingItems = useCompletingItems()
-  const rowRef = useRef<HTMLDivElement>(null)
 
   const icon = chore ? getChoreIcon(chore.name) : getChoreIcon(item.summary)
   const isCompleted = item.status === 'completed'
@@ -26,45 +25,55 @@ const TodoItem = ({ item, chore, sectionClass }: TodoItemProps) => {
   const stats = item.completion_stats
   const animate = config?.enable_animations !== false
 
-  const handleComplete = () => {
-    if (isCompleted || completing) return
-
-    if (animate) {
-      triggerHaptic()
+  const handleClick = () => {
+    if (completing) return
+    if (isCompleted) {
+      uncompleteItem(item.uid)
+      return
     }
-
-    // This now handles everything: optimistic update, backend call, animation timing
+    if (animate) triggerHaptic()
     completeItem(item.uid)
   }
 
   return (
-    <Row
-      ref={rowRef}
-      $isCompleted={isCompleted}
+    <Card
+      layout
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: isCompleted ? 0.5 : 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.96 }}
+      transition={{
+        duration: 0.25,
+        layout: { type: 'spring', stiffness: 500, damping: 35 },
+      }}
       $isOverdue={sectionClass === 'overdue'}
+      $isCompleted={isCompleted}
       $completing={completing}
+      onClick={handleClick}
     >
-      <Checkbox
-        $isCompleted={isCompleted}
-        $completing={completing}
-        onClick={handleComplete}
-      >
-        <ha-icon
-          icon={isCompleted || completing
-            ? 'mdi:checkbox-marked-circle'
-            : 'mdi:checkbox-blank-circle-outline'
-          }
-        />
-      </Checkbox>
+      <CheckboxWrap $checked={isCompleted || completing}>
+        <motion.div
+          animate={completing ? { scale: [1, 1.3, 1] } : {}}
+          transition={{ duration: 0.25 }}
+        >
+          <ha-icon
+            icon={isCompleted || completing
+              ? 'mdi:checkbox-marked-circle'
+              : 'mdi:checkbox-blank-circle-outline'
+            }
+          />
+        </motion.div>
+      </CheckboxWrap>
       <TodoIcon>
         <ha-icon icon={icon} />
       </TodoIcon>
       <TodoInfo>
-        <TodoSummary $isCompleted={isCompleted || completing}>{item.summary}</TodoSummary>
+        <TodoSummary $isCompleted={isCompleted || completing}>
+          {item.summary}
+        </TodoSummary>
       </TodoInfo>
       {stats && <StreakBadge streak={stats.streak} />}
       {assigneeName && <AssigneeAvatar name={assigneeName} />}
-    </Row>
+    </Card>
   )
 }
 
@@ -75,31 +84,23 @@ function extractAssignee(summary: string): string | null {
 
 export default TodoItem
 
-// ── Animations ────────────────────────────────────────────────────
-
-const checkmarkPop = keyframes`
-  0% { transform: scale(1); }
-  40% { transform: scale(1.4); }
-  100% { transform: scale(1); }
-`
-
-const itemFadeOut = keyframes`
-  0% { opacity: 1; max-height: 60px; padding-top: 10px; padding-bottom: 10px; margin-bottom: 0; }
-  50% { opacity: 0; max-height: 60px; padding-top: 10px; padding-bottom: 10px; margin-bottom: 0; }
-  100% { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; margin-bottom: -4px; }
-`
-
 // ── Styles ────────────────────────────────────────────────────────
 
-const Row = styled.div<{ $isCompleted?: boolean; $isOverdue?: boolean; $completing?: boolean }>`
+const Card = styled(motion.div)<{
+  $isCompleted?: boolean
+  $isOverdue?: boolean
+  $completing?: boolean
+}>`
   display: flex;
   align-items: center;
-  padding: 10px 12px;
-  border-radius: 8px;
-  gap: 8px;
-  transition: background-color 0.15s, opacity 0.3s;
+  padding: 22px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
+  gap: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 
-  &:hover {
+  &:hover, &:active {
     background: var(--secondary-background-color);
   }
 
@@ -108,50 +109,26 @@ const Row = styled.div<{ $isCompleted?: boolean; $isOverdue?: boolean; $completi
   `}
 
   ${(p) => p.$isCompleted && css`
-    opacity: 0.5;
+    cursor: pointer;
   `}
 
   ${(p) => p.$completing && css`
-    animation: ${itemFadeOut} 0.45s ease-out 0.28s forwards;
-    overflow: hidden;
     pointer-events: none;
-
-    @media (prefers-reduced-motion: reduce) {
-      animation: none;
-      opacity: 0.5;
-    }
   `}
 `
 
-const Checkbox = styled.div<{ $isCompleted?: boolean; $completing?: boolean }>`
-  cursor: pointer;
+const CheckboxWrap = styled.div<{ $checked?: boolean }>`
   flex-shrink: 0;
 
   ha-icon {
-    --mdc-icon-size: 22px;
+    --mdc-icon-size: 26px;
     color: var(--secondary-text-color);
-    transition: color 0.15s, transform 0.15s;
+    transition: color 0.15s;
   }
 
-  &:hover ha-icon {
-    color: var(--primary-color);
-  }
-
-  ${(p) => p.$isCompleted && css`
-    cursor: default;
+  ${(p) => p.$checked && css`
     ha-icon {
       color: var(--success-color, #4caf50);
-    }
-  `}
-
-  ${(p) => p.$completing && css`
-    ha-icon {
-      animation: ${checkmarkPop} 0.3s ease-out;
-      color: var(--success-color, #4caf50);
-
-      @media (prefers-reduced-motion: reduce) {
-        animation: none;
-      }
     }
   `}
 `
@@ -159,7 +136,7 @@ const Checkbox = styled.div<{ $isCompleted?: boolean; $completing?: boolean }>`
 const TodoIcon = styled.div`
   flex-shrink: 0;
   ha-icon {
-    --mdc-icon-size: 18px;
+    --mdc-icon-size: 22px;
     color: var(--secondary-text-color);
   }
 `
@@ -170,7 +147,7 @@ const TodoInfo = styled.div`
 `
 
 const TodoSummary = styled.span<{ $isCompleted?: boolean }>`
-  font-size: 1.025rem;
+  font-size: 1.2rem;
   color: var(--primary-text-color);
   white-space: nowrap;
   overflow: hidden;

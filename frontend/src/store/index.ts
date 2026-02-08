@@ -47,6 +47,7 @@ export interface ChoreSchedulerStore {
   unsubscribe: () => void
   loadData: () => Promise<void>
   completeItem: (uid: string) => Promise<void>
+  uncompleteItem: (uid: string) => Promise<void>
   triggerChore: (choreId: string) => Promise<void>
   saveChore: (chore: Partial<Chore>, isNew: boolean) => Promise<void>
   deleteChore: (choreId: string) => Promise<void>
@@ -96,14 +97,9 @@ export const createChoreSchedulerStore = () =>
           // Ignore messages from stale subscriptions
           if (get()._subscriptionId !== id) return
 
-          const { completingItems } = get()
-          // Merge with optimistic completing state
-          const items = (message.items ?? []).map((item) =>
-            completingItems[item.uid] ? { ...item, status: 'completed' as const } : item
-          )
           set({
             chores: message.chores ?? [],
-            todoItems: items,
+            todoItems: message.items ?? [],
             loading: false,
           })
         },
@@ -127,7 +123,7 @@ export const createChoreSchedulerStore = () =>
     },
 
     loadData: async () => {
-      const { hass, completingItems } = get()
+      const { hass } = get()
       if (!hass) return
       set({ loading: true })
       try {
@@ -135,16 +131,9 @@ export const createChoreSchedulerStore = () =>
           hass.connection.sendMessagePromise<ListChoresResponse>({ type: `${DOMAIN}/list` }),
           hass.connection.sendMessagePromise<ListTodosResponse>({ type: `${DOMAIN}/todos` }),
         ])
-        // Merge with completing items - preserve optimistic state
-        const items = (todosResp?.items ?? []).map((item) => {
-          if (completingItems[item.uid]) {
-            return { ...item, status: 'completed' as const }
-          }
-          return item
-        })
         set({
           chores: choresResp?.chores ?? [],
-          todoItems: items,
+          todoItems: todosResp?.items ?? [],
         })
       } catch (err) {
         console.warn('[ChoreScheduler] Failed to load data:', err)
@@ -155,38 +144,56 @@ export const createChoreSchedulerStore = () =>
     },
 
     completeItem: async (uid) => {
-      const { hass, todoItems, completingItems } = get()
+      const { hass, completingItems } = get()
       if (!hass) return
-      if (completingItems[uid]) return // Already completing
+      if (completingItems[uid]) return
 
-      // Optimistic update FIRST - before any async work
-      set({
-        completingItems: { ...completingItems, [uid]: true },
-        todoItems: todoItems.map((i) =>
-          i.uid === uid
-            ? { ...i, status: 'completed' as const, completed_at: new Date().toISOString() }
-            : i
-        ),
-      })
+      // Phase 1: Visual flag only - item stays in pending section showing checked state
+      set({ completingItems: { ...completingItems, [uid]: true } })
 
-      // Fire backend call (don't await - let animation proceed)
+      // Fire backend call (don't await)
       hass.connection.sendMessagePromise({
         type: `${DOMAIN}/complete_todo`,
         uid,
-      }).then(() => {
-        // After animation completes (~800ms), remove from completing set
-        // Subscription will push the real update
-        setTimeout(() => {
-          const { completingItems: current } = get()
-          const { [uid]: _, ...rest } = current
-          set({ completingItems: rest })
-        }, 800)
       }).catch((err) => {
         console.error('[ChoreScheduler] Failed to complete todo:', err)
-        // Revert optimistic update on error
         const { completingItems: current } = get()
         const { [uid]: _, ...rest } = current
         set({ completingItems: rest })
+      })
+
+      // Phase 2: After animation hold, clear flag so item moves to completed section
+      // Subscription will have arrived by now; if not, apply optimistic fallback
+      setTimeout(() => {
+        const { completingItems: current, todoItems } = get()
+        if (!current[uid]) return // Error handler already cleaned up
+        const { [uid]: _, ...rest } = current
+        const items = todoItems.map((i) =>
+          i.uid === uid && i.status !== 'completed'
+            ? { ...i, status: 'completed' as const, completed_at: new Date().toISOString() }
+            : i
+        )
+        set({ completingItems: rest, todoItems: items })
+      }, 500)
+    },
+
+    uncompleteItem: async (uid) => {
+      const { hass, todoItems } = get()
+      if (!hass) return
+
+      // Optimistic: move item back to needs_action immediately
+      const items = todoItems.map((i) =>
+        i.uid === uid ? { ...i, status: 'needs_action' as const, completed_at: undefined } : i
+      )
+      set({ todoItems: items })
+
+      hass.connection.sendMessagePromise({
+        type: `${DOMAIN}/uncomplete_todo`,
+        uid,
+      }).catch((err) => {
+        console.error('[ChoreScheduler] Failed to uncomplete todo:', err)
+        // Revert on failure
+        get().loadData()
       })
     },
 

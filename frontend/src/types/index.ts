@@ -10,6 +10,7 @@ export interface HomeAssistant {
   }
   connection: {
     sendMessagePromise<T>(message: { type: string; [key: string]: unknown }): Promise<T>
+    subscribeMessage<T>(callback: (message: T) => void, message: { type: string; [key: string]: unknown }): Promise<() => void>
   }
   callService(
     domain: string,

@@ -132,7 +132,7 @@ const ChoreEditorModal = ({ chore, onSave, onDelete, onTrigger, onClose }: Chore
 
   return (
     <Overlay ref={overlayRef} $closing={closing} onClick={animateClose}>
-      <Dialog $closing={closing} onClick={(e: Event) => e.stopPropagation()}>
+      <Dialog $closing={closing} onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <h2>{isNew ? t('editor.add_title') : t('editor.edit_title')}</h2>
         </DialogHeader>
@@ -140,7 +140,7 @@ const ChoreEditorModal = ({ chore, onSave, onDelete, onTrigger, onClose }: Chore
         <DialogContent>
           {/* Name */}
           <FormGroup>
-            <FormLabel class="required">{t('editor.name')}</FormLabel>
+            <FormLabel className="required">{t('editor.name')}</FormLabel>
             <ha-textfield
               value={name}
               onInput={(e: Event) => setName((e.target as HTMLInputElement).value)}

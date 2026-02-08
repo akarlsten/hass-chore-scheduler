@@ -22,6 +22,7 @@ def async_register_websocket_api(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_subscribe_chores)
     websocket_api.async_register_command(hass, ws_list_todos)
     websocket_api.async_register_command(hass, ws_complete_todo)
+    websocket_api.async_register_command(hass, ws_uncomplete_todo)
 
 
 @websocket_api.websocket_command(
@@ -172,6 +173,37 @@ async def ws_complete_todo(
         if todo_entity:
             await todo_entity.async_update_todo_item(
                 TodoItem(uid=uid, status=TodoItemStatus.COMPLETED)
+            )
+            connection.send_result(msg["id"], {"success": True})
+            return
+
+    connection.send_error(
+        msg["id"], "not_found", "Todo entity not available"
+    )
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "chore_scheduler/uncomplete_todo",
+        vol.Required("uid"): str,
+    }
+)
+@websocket_api.async_response
+async def ws_uncomplete_todo(
+    hass: HomeAssistant,
+    connection: websocket_api.ActiveConnection,
+    msg: dict,
+) -> None:
+    """Mark a completed todo item back to needs_action."""
+    uid = msg["uid"]
+
+    for entry_data in hass.data.get(DOMAIN, {}).values():
+        if not isinstance(entry_data, dict):
+            continue
+        todo_entity = entry_data.get("todo_entity")
+        if todo_entity:
+            await todo_entity.async_update_todo_item(
+                TodoItem(uid=uid, status=TodoItemStatus.NEEDS_ACTION)
             )
             connection.send_result(msg["id"], {"success": True})
             return

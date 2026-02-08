@@ -19,6 +19,7 @@
   "license": "MIT",
   "dependencies": {
     "custom-card-helpers": "^1.9.0",
+    "framer-motion": "^12.33.0",
     "preact": "^10.19.7",
     "styled-components": "^6.1.8",
     "zustand": "^4.5.2"
