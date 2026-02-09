@@ -1,4 +1,4 @@
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence, LayoutGroup } from 'framer-motion'
 import styled, { css } from 'styled-components'
 import { TodoItem as TodoItemType, Chore } from '@types'
 import TodoItem from './TodoItem'
@@ -15,16 +15,18 @@ const TodoSection = ({ title, items, choresById, sectionClass }: TodoSectionProp
     <Section>
       <SectionHeader $isOverdue={sectionClass === 'overdue'}>{title}</SectionHeader>
       <TodoList>
-        <AnimatePresence mode="popLayout">
-          {items.map((item) => (
-            <TodoItem
-              key={item.uid}
-              item={item}
-              chore={choresById.get(item.chore_id)}
-              sectionClass={sectionClass}
-            />
-          ))}
-        </AnimatePresence>
+        <LayoutGroup>
+          <AnimatePresence mode="popLayout">
+            {items.map((item) => (
+              <TodoItem
+                key={item.uid}
+                item={item}
+                chore={choresById.get(item.chore_id)}
+                sectionClass={sectionClass}
+              />
+            ))}
+          </AnimatePresence>
+        </LayoutGroup>
       </TodoList>
     </Section>
   )
@@ -54,7 +56,9 @@ const SectionHeader = styled.div<{ $isOverdue?: boolean }>`
 `
 
 const TodoList = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overflow: hidden;
 `

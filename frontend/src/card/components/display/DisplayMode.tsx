@@ -1,7 +1,7 @@
-import { useMemo } from 'preact/hooks'
+import { useMemo, useRef } from 'preact/hooks'
 import styled from 'styled-components'
 import { TodoItem, Chore, ChoreSchedulerCardConfig } from '@types'
-import { useLocalize, useCompletingItems } from '@hooks'
+import { useLocalize, useCompletingItems, useTransitioningItems } from '@hooks'
 import TodoSection from './TodoSection'
 import EmptyState from './EmptyState'
 import AllDoneState from './AllDoneState'
@@ -15,16 +15,29 @@ interface DisplayModeProps {
 const DisplayMode = ({ todoItems, chores, config }: DisplayModeProps) => {
   const t = useLocalize()
   const completing = useCompletingItems()
+  const transitioning = useTransitioningItems()
   const choresById = useMemo(() => new Map(chores.map((c) => [c.id, c])), [chores])
+  const prevPendingRef = useRef(-1)
+  const celebrateRef = useRef(false)
 
   // Keep completing items in pending section until animation finishes
   const pending = todoItems.filter((i) => i.status === 'needs_action' || completing[i.uid])
   const completed = todoItems
-    .filter((i) => i.status === 'completed' && !completing[i.uid])
+    .filter((i) => i.status === 'completed' && !completing[i.uid] && !transitioning[i.uid])
     .sort((a, b) => (b.completed_at ?? '').localeCompare(a.completed_at ?? ''))
     .slice(0, 3)
 
-  if (pending.length === 0 && completed.length === 0) {
+  // Sticky celebrate flag: set when pending transitions from >0 → 0, cleared when pending returns
+  if (prevPendingRef.current > 0 && pending.length === 0) {
+    celebrateRef.current = true
+  } else if (pending.length > 0) {
+    celebrateRef.current = false
+  }
+  prevPendingRef.current = pending.length
+
+  // Items mid-animation count as "something to show" — don't flash EmptyState
+  const hasTransitioning = Object.keys(transitioning).length > 0
+  if (pending.length === 0 && completed.length === 0 && !celebrateRef.current && !hasTransitioning) {
     return <EmptyState />
   }
 
@@ -33,31 +46,23 @@ const DisplayMode = ({ todoItems, chores, config }: DisplayModeProps) => {
   const todayItems = pending.filter((i) => !i.due || i.due === today)
   const upcoming = pending.filter((i) => i.due && i.due > today)
 
-  if (pending.length === 0 && completed.length > 0) {
-    return (
-      <Container>
-        <AllDoneState />
-        <Spacer />
-        {config.show_completed && (
-          <TodoSection title={t('display.done')} items={completed} choresById={choresById} sectionClass="completed" />
-        )}
-      </Container>
-    )
-  }
-
   return (
     <Container>
-      <PendingSections>
-        {overdue.length > 0 && (
-          <TodoSection title={t('display.overdue')} items={overdue} choresById={choresById} sectionClass="overdue" />
-        )}
-        {todayItems.length > 0 && (
-          <TodoSection title={t('display.today')} items={todayItems} choresById={choresById} sectionClass="today" />
-        )}
-        {upcoming.length > 0 && (
-          <TodoSection title={t('display.upcoming')} items={upcoming} choresById={choresById} sectionClass="upcoming" />
-        )}
-      </PendingSections>
+      {pending.length === 0 ? (
+        <AllDoneState celebrate={celebrateRef.current} />
+      ) : (
+        <PendingSections>
+          {overdue.length > 0 && (
+            <TodoSection title={t('display.overdue')} items={overdue} choresById={choresById} sectionClass="overdue" />
+          )}
+          {todayItems.length > 0 && (
+            <TodoSection title={t('display.today')} items={todayItems} choresById={choresById} sectionClass="today" />
+          )}
+          {upcoming.length > 0 && (
+            <TodoSection title={t('display.upcoming')} items={upcoming} choresById={choresById} sectionClass="upcoming" />
+          )}
+        </PendingSections>
+      )}
       {config.show_completed && completed.length > 0 && (
         <>
           <Spacer />
