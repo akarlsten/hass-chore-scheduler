@@ -64,7 +64,7 @@ const TodoItem = ({ item, chore, sectionClass }: TodoItemProps) => {
       $completing={completing || uncompleting}
       onClick={handleClick}
     >
-      <CheckboxWrap $checked={isCompleted || completing} $completing={completing}>
+      <CheckboxWrap $checked={isCompleted || completing} $completing={completing} $small={isDone}>
         <motion.div
           animate={completing ? { scale: [1, 1.3, 1] } : {}}
           transition={{ duration: 0.25 }}
@@ -77,7 +77,7 @@ const TodoItem = ({ item, chore, sectionClass }: TodoItemProps) => {
           />
         </motion.div>
       </CheckboxWrap>
-      <TodoIcon>
+      <TodoIcon $small={isDone}>
         <ha-icon icon={icon} />
       </TodoIcon>
       <TodoInfo>
@@ -107,12 +107,12 @@ const Card = styled(motion.div)<{
 }>`
   display: flex;
   align-items: center;
-  height: 76px;
-  padding: 0 20px;
+  height: ${(p) => p.$isCompleted ? '56px' : '76px'};
+  padding: 0 ${(p) => p.$isCompleted ? '16px' : '20px'};
   border-radius: 12px;
   border: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
   box-sizing: border-box;
-  gap: 10px;
+  gap: ${(p) => p.$isCompleted ? '8px' : '10px'};
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 
@@ -145,12 +145,12 @@ const checkboxRingPulse = keyframes`
   100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
 `
 
-const CheckboxWrap = styled.div<{ $checked?: boolean; $completing?: boolean }>`
+const CheckboxWrap = styled.div<{ $checked?: boolean; $completing?: boolean; $small?: boolean }>`
   flex-shrink: 0;
   position: relative;
 
   ha-icon {
-    --mdc-icon-size: 26px;
+    --mdc-icon-size: ${(p) => p.$small ? '20px' : '26px'};
     color: var(--secondary-text-color);
     transition: color 0.15s;
   }
@@ -184,10 +184,10 @@ const CheckboxWrap = styled.div<{ $checked?: boolean; $completing?: boolean }>`
   `}
 `
 
-const TodoIcon = styled.div`
+const TodoIcon = styled.div<{ $small?: boolean }>`
   flex-shrink: 0;
   ha-icon {
-    --mdc-icon-size: 22px;
+    --mdc-icon-size: ${(p) => p.$small ? '18px' : '22px'};
     color: var(--secondary-text-color);
   }
 `
@@ -198,7 +198,7 @@ const TodoInfo = styled.div`
 `
 
 const TodoSummary = styled.span<{ $isCompleted?: boolean }>`
-  font-size: 1.2rem;
+  font-size: ${(p) => p.$isCompleted ? '1rem' : '1.2rem'};
   color: var(--primary-text-color);
   white-space: nowrap;
   overflow: hidden;

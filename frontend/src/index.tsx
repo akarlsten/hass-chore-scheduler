@@ -43,14 +43,14 @@ class ChoreSchedulerCardElement extends HTMLElement {
 
   private _applyStyles() {
     if (this._config?.expand_to_viewport) {
-      // Make the element fill available viewport height
+      // Make the element fill exactly the available viewport height (not min — cap it so children scroll)
       this.style.display = 'flex'
       this.style.flexDirection = 'column'
-      this.style.minHeight = 'calc(100vh - 90px)'
+      this.style.height = 'calc(100vh - 90px)'
     } else {
       this.style.display = ''
       this.style.flexDirection = ''
-      this.style.minHeight = ''
+      this.style.height = ''
     }
   }
 

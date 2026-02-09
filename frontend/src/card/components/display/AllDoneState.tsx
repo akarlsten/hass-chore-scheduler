@@ -74,9 +74,9 @@ const IconWrap = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 240px;
-  height: 240px;
-  margin-bottom: -64px;
+  width: 160px;
+  height: 160px;
+  margin-bottom: -24px;
 `
 
 const GlowRing = styled.div`
@@ -111,10 +111,10 @@ const Particle = styled.div<{ $index: number }>`
   border-radius: 50%;
   opacity: 0;
   background: ${(p) => PARTICLE_COLORS[p.$index]};
-  --sx: ${(p) => Math.round(Math.cos((p.$index * 45 * Math.PI) / 180) * 28)}px;
-  --sy: ${(p) => Math.round(Math.sin((p.$index * 45 * Math.PI) / 180) * 28)}px;
-  --px: ${(p) => Math.round(Math.cos((p.$index * 45 * Math.PI) / 180) * 110)}px;
-  --py: ${(p) => Math.round(Math.sin((p.$index * 45 * Math.PI) / 180) * 110)}px;
+  --sx: ${(p) => Math.round(Math.cos((p.$index * 45 * Math.PI) / 180) * 20)}px;
+  --sy: ${(p) => Math.round(Math.sin((p.$index * 45 * Math.PI) / 180) * 20)}px;
+  --px: ${(p) => Math.round(Math.cos((p.$index * 45 * Math.PI) / 180) * 75)}px;
+  --py: ${(p) => Math.round(Math.sin((p.$index * 45 * Math.PI) / 180) * 75)}px;
   animation: ${particleBurst} 0.6s ease-out ${(p) => 0.2 + p.$index * 0.025}s forwards;
 
   @media (prefers-reduced-motion: reduce) {
