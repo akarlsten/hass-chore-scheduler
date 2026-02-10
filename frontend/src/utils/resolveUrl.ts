@@ -7,8 +7,7 @@ import { HomeAssistant, HassEntity } from '@types'
  * On desktop these resolve fine against the HA origin, but on Cast (Nest Hub) the
  * page origin is cast.home-assistant.io so relative URLs break.
  *
- * Prepending hass.hassUrl makes the URL absolute so the Cast service worker can
- * intercept the request and attach the auth token.
+ * NOTE: hass.hassUrl is a METHOD (not a string) — call it with the path.
  */
 export function resolveEntityPicture(
   hass: HomeAssistant | undefined,
@@ -22,10 +21,17 @@ export function resolveEntityPicture(
     return picture
   }
 
-  // Relative path — prefix with the HA instance URL when available
-  const hassUrl = (hass as any)?.hassUrl as string | undefined
-  if (hassUrl && picture.startsWith('/')) {
-    return `${hassUrl}${picture}`
+  // hass.hassUrl is a method in HA frontend: hassUrl(path?) => absolute URL
+  if (picture.startsWith('/')) {
+    const h = hass as any
+    if (typeof h?.hassUrl === 'function') {
+      try { return h.hassUrl(picture) } catch { /* fall through */ }
+    }
+    // Fallback: try auth.data.hassUrl (string)
+    const base = h?.auth?.data?.hassUrl as string | undefined
+    if (base) {
+      return `${base}${picture}`
+    }
   }
 
   // Fallback: return as-is (works on desktop where origin matches)

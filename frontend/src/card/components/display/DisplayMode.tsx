@@ -65,7 +65,7 @@ const DisplayMode = ({ todoItems, chores, config }: DisplayModeProps) => {
       )}
       {config.show_completed && completed.length > 0 && (
         <>
-          <Spacer />
+          {pending.length > 0 && <Spacer />}
           <TodoSection title={t('display.done')} items={completed} choresById={choresById} sectionClass="completed" />
         </>
       )}

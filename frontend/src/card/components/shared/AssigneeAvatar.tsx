@@ -1,3 +1,4 @@
+import { useState } from 'preact/hooks'
 import styled from 'styled-components'
 import { useHass } from '@hooks'
 import { resolveEntityPicture } from '@utils/resolveUrl'
@@ -8,17 +9,20 @@ interface AssigneeAvatarProps {
 
 const AssigneeAvatar = ({ name }: AssigneeAvatarProps) => {
   const hass = useHass()
+  const [imgError, setImgError] = useState(false)
   const entityId = `person.${name.toLowerCase().replace(/\s+/g, '_')}`
   const personState = hass?.states[entityId]
   const picture = resolveEntityPicture(hass, personState)
   const initial = name.charAt(0).toUpperCase()
+  const showImg = picture && !imgError
 
   return (
     <AvatarRoot title={name}>
-      {picture
+      {showImg
         ? <img
             src={picture}
             alt={name}
+            onError={() => setImgError(true)}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         : <AvatarInitial>{initial}</AvatarInitial>
