@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import { useHass } from '@hooks'
+import { resolveEntityPicture } from '@utils/resolveUrl'
 
 interface AssigneeAvatarProps {
   name: string
@@ -9,7 +10,7 @@ const AssigneeAvatar = ({ name }: AssigneeAvatarProps) => {
   const hass = useHass()
   const entityId = `person.${name.toLowerCase().replace(/\s+/g, '_')}`
   const personState = hass?.states[entityId]
-  const picture = personState?.attributes?.entity_picture as string | undefined
+  const picture = resolveEntityPicture(hass, personState)
   const initial = name.charAt(0).toUpperCase()
 
   return (

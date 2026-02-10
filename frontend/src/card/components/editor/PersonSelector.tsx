@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components'
 import { useHass } from '@hooks'
-import { HassEntity } from '@types'
+import { HassEntity, HomeAssistant } from '@types'
+import { resolveEntityPicture } from '@utils/resolveUrl'
 
 interface PersonSelectorProps {
   selectedAssignee: string | null
@@ -41,9 +42,10 @@ interface PersonOptionItemProps {
 }
 
 const PersonOptionItem = ({ person, isSelected, onSelect }: PersonOptionItemProps) => {
+  const hass = useHass()
   const fullName = (person.attributes.friendly_name as string) || person.entity_id.split('.')[1].replace(/_/g, ' ')
   const firstName = fullName.split(' ')[0]
-  const picture = person.attributes.entity_picture as string | undefined
+  const picture = resolveEntityPicture(hass, person)
 
   return (
     <PersonOption $selected={isSelected} onClick={onSelect}>
